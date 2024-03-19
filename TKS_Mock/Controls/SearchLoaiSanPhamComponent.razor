@@ -1,0 +1,20 @@
+﻿<div class="input-group">
+    <input type="text"
+            class="form-control"
+            placeholder="Điền loại sản phẩm để tìm kiếm"
+            @bind-value="v_strLSPNameToSearch" />
+    <button type="button" 
+        class="btn-success input-group-text"
+        @onclick="OnSearch">Tìm kiếm</button>
+</div>
+
+@code {
+    private string v_strLSPNameToSearch = string.Empty;
+
+    public EventCallback<string> OnSearchLSP{ get; set; }
+
+    private void OnSearch()
+    {
+        
+    }
+}
