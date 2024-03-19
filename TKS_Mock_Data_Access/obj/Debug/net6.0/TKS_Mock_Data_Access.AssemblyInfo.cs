@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TKS_Mock_Data_Access")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9e79b43227e26f1ec88bfd58d8cc12811d4259bd")]
 [assembly: System.Reflection.AssemblyProductAttribute("TKS_Mock_Data_Access")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TKS_Mock_Data_Access")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

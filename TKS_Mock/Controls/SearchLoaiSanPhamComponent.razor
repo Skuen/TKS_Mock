@@ -10,11 +10,11 @@
 
 @code {
     private string v_strLSPNameToSearch = string.Empty;
-
+    [Parameter]
     public EventCallback<string> OnSearchLSP{ get; set; }
 
     private void OnSearch()
     {
-        
+        OnSearchLSP.InvokeAsync(v_strLSPNameToSearch);
     }
 }
