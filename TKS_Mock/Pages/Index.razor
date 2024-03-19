@@ -1,0 +1,23 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<ul>
+    @foreach(var item in v_arrLSP)
+    {
+        <li>
+            @item.Ma_LSP
+            @item.Ten_LSP
+            @item.Ghi_Chu
+        </li>
+    }
+</ul>
+@code{
+    public List<CDM_Loai_San_Pham> v_arrLSP= new();
+    CDM_Loai_San_Pham_Controller v_objLSPController = new();
+    protected override void OnInitialized()
+    {
+        v_arrLSP = v_objLSPController.FQ_122_LSP_sp_sel_List_For_Cache();
+    }
+
+}
