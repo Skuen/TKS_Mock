@@ -57,7 +57,10 @@
     public CDM_Loai_San_Pham v_objLSP_For_Delete = new();
     CDM_Loai_San_Pham_Controller v_objLSPController = new();
     private ConfirmBase confirmDialog;
-
+    protected override void OnInitialized()
+    {
+        v_arrLSP = v_objLSPController.FQ_122_LSP_sp_sel_List_For_Cache();
+    }
     private void OnSearch()
     {
         if (string.IsNullOrEmpty(v_strSearchTerm))
@@ -69,28 +72,14 @@
     {
         NavigationManager.NavigateTo("/AddLSP");
     }
-    private void ShowConfirmation(CDM_Loai_San_Pham LSP)
-    {
-        confirmDialog.Show();
-        v_objLSP_For_Delete = LSP;
-    }
-    private void HandleConfirm(bool value)
-    {
-        if (value)
-        {
-            DeleteLSP(v_objLSP_For_Delete);
-        }
-    }
+    
     protected override void OnParametersSet()
     {
         //Nhớ Sửa thằng này xả list by name sử dụng parameter là v_strSearchTerm
         v_arrLSP = v_objLSPController.FQ_122_LSP_sp_sel_List_For_Cache();
 
     }
-    protected override void OnInitialized()
-    {
-        v_arrLSP = v_objLSPController.FQ_122_LSP_sp_sel_List_For_Cache();
-    }
+    
     private void EditLSP(string Ma_LSP)
     {
         NavigationManager.NavigateTo($"/EditLSP/{Ma_LSP}");
@@ -105,6 +94,18 @@
         catch (Exception ex)
         {
             throw;
+        }
+    }
+    private void ShowConfirmation(CDM_Loai_San_Pham LSP)
+    {
+        confirmDialog.Show();
+        v_objLSP_For_Delete = LSP;
+    }
+    private void HandleConfirm(bool value)
+    {
+        if (value)
+        {
+            DeleteLSP(v_objLSP_For_Delete);
         }
     }
 }

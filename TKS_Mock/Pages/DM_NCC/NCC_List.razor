@@ -1,0 +1,104 @@
+﻿@page "/NCC"
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+<h3>Danh sách Nhà cung cấp</h3>
+<br />
+<!-- Thanh tìm kiếm -->
+<div class="input-group">
+    <input type="text"
+           class="form-control"
+           placeholder="Điền tên nhà cung cấp để tìm kiếm"
+           @bind-value="v_strSearchTerm" />
+    <button type="button"
+            class="btn-success input-group-text"
+            @onclick="OnSearch">
+        Tìm kiếm
+    </button>
+</div>
+<table class="table"
+    <thead>
+        <tr>
+            <th>Mã NCC</th>
+            <th>Tên NCC</th>
+            <th>Ghi Chú</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in v_arrNCC)
+        {
+                        <tr>
+                            <td>@item.Ma_NCC</td>
+                            <td>@item.Ten_NCC</td>
+                            <td>@item.Ghi_Chu</td>
+                            <td>
+                                <button type="button"
+                                            class="btn btn-success" @onclick="@(()=>EditNCC(item.Ma_NCC))">Edit</button>
+                                <button type="button"
+                                                    class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
+                            </td>
+
+                        </tr>
+        }
+    </tbody>
+</table>
+<ConfirmDialog @ref="confirmDialog" OnConfirmed="HandleConfirm"></ConfirmDialog>
+<br />
+<!--Nút thêm mới-->
+<button type="button"
+        class="btn btn-primary"
+        @onclick="AddNCC">
+    Thêm Nhà cung cấp
+</button>
+@code {
+    private string v_strSearchTerm = string.Empty;
+    public List<CDM_NCC> v_arrNCC = new();
+    public CDM_NCC v_objNCC_For_Delete = new();
+    CDM_NCC_Controller v_objNCCController = new();
+    private ConfirmBase confirmDialog;
+
+    private void OnSearch()
+    {
+        if (string.IsNullOrEmpty(v_strSearchTerm))
+        {
+            v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
+        }
+    }
+    private void AddNCC()
+    {
+        NavigationManager.NavigateTo("/AddNCC");
+    }
+    protected override void OnInitialized()
+    {
+        v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
+    }
+    private void EditNCC(string Ma_NCC)
+    {
+        NavigationManager.NavigateTo($"/EditNCC/{Ma_NCC}");
+    }
+    private void DeleteKho(CDM_NCC v_objNCC)
+    {
+        try
+        {
+            int v_iRes = v_objNCCController.FQ_123_N_sp_del_Delete_By_ID(v_objNCC.Ma_NCC);
+            v_arrNCC.Remove(v_objNCC);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+    private void ShowConfirmation(CDM_NCC v_objNCC)
+    {
+        confirmDialog.Show();
+        v_objNCC_For_Delete = v_objNCC;
+    }
+    private void HandleConfirm(bool value)
+    {
+        if (value)
+        {
+            DeleteKho(v_objNCC_For_Delete);
+        }
+    }
+
+}

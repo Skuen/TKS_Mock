@@ -1,11 +1,104 @@
 ﻿@page "/Kho"
 
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 <h3>Danh sách Kho</h3>
 <br />
+<!-- Thanh tìm kiếm -->
+<div class="input-group">
+    <input type="text"
+           class="form-control"
+           placeholder="Điền tên kho để tìm kiếm"
+           @bind-value="v_strSearchTerm" />
+    <button type="button"
+            class="btn-success input-group-text"
+            @onclick="OnSearch">
+        Tìm kiếm
+    </button>
+</div>
 
+<table class="table"
+    <thead>
+        <tr>
+            <th>Mã Kho</th>
+            <th>Tên Kho</th>
+            <th>Ghi Chú</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in v_arrKho)
+        {
+                    <tr>
+                        <td>@item.Ma_Kho</td>
+                        <td>@item.Ten_Kho</td>
+                        <td>@item.Ghi_Chu</td>
+                        <td>
+                            <button type="button"
+                                        class="btn btn-success" @onclick="@(()=>EditKho(item.Ma_Kho))">Edit</button>
+                            <button type="button"
+                                                class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
+                        </td>
+
+                    </tr>
+        }
+    </tbody>
+</table>
+<ConfirmDialog @ref="confirmDialog" OnConfirmed="HandleConfirm"></ConfirmDialog>
 <br />
-
+<!--Nút thêm mới-->
+<button type="button"
+        class="btn btn-primary"
+        @onclick="AddKho">
+    Thêm Kho
+</button>
 @code {
+    private string v_strSearchTerm = string.Empty;
+    public List<CDM_Kho> v_arrKho = new();
+    public CDM_Kho v_objKho_For_Delete = new();
+    CDM_Kho_Controller v_objKhoController = new();
+    private ConfirmBase confirmDialog;
 
+    private void OnSearch()
+    {
+        if (string.IsNullOrEmpty(v_strSearchTerm))
+        {
+            v_arrKho = v_objKhoController.FQ_114_K_sp_sel_List_For_Cache();
+        }
+    }
+    protected override void OnInitialized()
+    {
+        v_arrKho = v_objKhoController.FQ_114_K_sp_sel_List_For_Cache();
+    }
+    private void AddKho()
+    {
+        NavigationManager.NavigateTo("/AddKho");
+    }
+    private void EditKho(string Ma_Kho)
+    {
+        NavigationManager.NavigateTo($"/EditKho/{Ma_Kho}");
+    }
+    private void DeleteKho(CDM_Kho Kho)
+    {
+        try
+        {
+            int v_iRes = v_objKhoController.FQ_114_K_sp_del_Delete_By_ID(Kho.Ma_Kho);
+            v_arrKho.Remove(Kho);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+    private void ShowConfirmation(CDM_Kho v_objKho)
+    {
+        confirmDialog.Show();
+        v_objKho_For_Delete = v_objKho;
+    }
+    private void HandleConfirm(bool value)
+    {
+        if (value)
+        {
+            DeleteKho(v_objKho_For_Delete);
+        }
+    }
 }

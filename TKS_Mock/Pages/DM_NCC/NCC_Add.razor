@@ -1,0 +1,64 @@
+﻿@page "/AddNCC"
+@inject NavigationManager NavigationManager
+
+<h3>Thêm mới NCC</h3>
+<br />
+<EditForm Model="v_objNCC" OnValidSubmit="InsertNCC">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div class="form-group">
+        <label for="id">Mã NCC</label>
+        <InputText id="id" @bind-Value="v_objNCC.Ma_NCC" class="form-control"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="name">Tên NCC</label>
+        <InputText id="name" @bind-Value="v_objNCC.Ten_NCC" class="form-control"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="note">Ghi Chú</label>
+        <InputText id="note" @bind-Value="v_objNCC.Ghi_Chu" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <button type="button" class="btn btn-primary" @onclick="BackToList">Quay Lại</button>
+</EditForm>
+
+@if (IsInserted)
+{
+    if (v_ires == 1)
+    {
+        <p class="alert alert-success">Thêm mới thành công</p>
+    }
+    else
+    {
+        <p class="alert alert-danger">Thêm mới thất bại</p>
+    }
+}
+@code {
+    private CDM_NCC v_objNCC = new();
+    private CDM_NCC_Controller v_objKhoController = new();
+    private bool IsInserted = false;
+    private int v_ires = 0;
+    private void InsertNCC()
+    {
+        if (this.v_objNCC != null)
+        {
+            try
+            {
+                IsInserted = true;
+                v_ires = v_objKhoController.FQ_123_N_sp_ins_Insert(v_objNCC);
+            }
+            catch (Exception ex)
+            {
+                v_ires = 0;
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+    }
+    private void BackToList()
+    {
+        NavigationManager.NavigateTo("/NCC");
+    }
+}

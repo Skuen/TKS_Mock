@@ -1,0 +1,72 @@
+﻿@page "/EditKho/{Ma_Kho}"
+@inject NavigationManager NavigationManager
+<h3>Chỉnh sửa Kho</h3>
+<br />
+<EditForm Model="v_objKho" OnValidSubmit="UpdateKho">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div class="form-group">
+        <label for="id">Mã Kho</label>
+        <InputText id="id" @bind-Value="v_objKho.Ma_Kho" class="form-control" readonly></InputText>
+    </div>
+    <div class="form-group">
+        <label for="name">Tên Kho</label>
+        <InputText id="name" @bind-Value="v_objKho.Ten_Kho" class="form-control"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="note">Ghi Chú</label>
+        <InputText id="note" @bind-Value="v_objKho.Ghi_Chu" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <button type="button" class="btn btn-primary" @onclick="BackToList">Quay Lại</button>
+</EditForm>
+@if (IsUpdated)
+{
+    if (v_ires == 1)
+    {
+        <p class="alert alert-success">Cập nhập thành công</p>
+    }
+    else
+    {
+        <p class="alert alert-danger">Cập nhập thất bại</p>
+        <p class="alert alert-danger">@v_strArlertMessage</p>
+
+    }
+}
+@code {
+    [Parameter]
+    public string Ma_Kho { get; set; }
+    private CDM_Kho v_objKho = new();
+    private CDM_Kho_Controller v_objKhoController = new();
+    private bool IsUpdated = false;
+    private int v_ires = 0;
+    private string v_strArlertMessage = string.Empty;
+    protected override void OnInitialized()
+    {
+        v_objKho = v_objKhoController.FQ_114_K_sp_sel_Get_By_ID(Ma_Kho);
+    }
+    private void UpdateKho()
+    {
+        if (this.v_objKho != null)
+        {
+            try
+            {
+                IsUpdated = true;
+                v_ires = v_objKhoController.FQ_114_K_sp_upd_Update(v_objKho);
+            }
+            catch (Exception ex)
+            {
+                v_ires = 0;
+                v_strArlertMessage = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+    }
+    private void BackToList()
+    {
+        NavigationManager.NavigateTo("/Kho");
+    }
+}
