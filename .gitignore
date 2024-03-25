@@ -1,6 +1,8 @@
 .vs/
-bin/
-obj/
+TKS_Mock_Data_Access/bin/
+TKS_Mock_Data_Access/obj/
+TKS_Mock/bin/
+TKS_Mock/obj/
 *.user
 artifacts/
 .vscode/
