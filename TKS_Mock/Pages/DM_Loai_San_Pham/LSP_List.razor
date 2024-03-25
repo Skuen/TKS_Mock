@@ -2,8 +2,17 @@
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject SweetAlertService Swal
 <h3>Loại Sản Phẩm</h3>
 <br/>
+<!--Nút thêm mới-->
+<button type="button"
+        class="btn btn-primary"
+        @onclick="AddLSP">
+    Thêm Loại Sản Phẩm
+</button>
+<br />
+<br />
 <!-- Thanh tìm kiếm -->
 <div class="input-group">
     <input type="text"
@@ -29,34 +38,27 @@
     <tbody>
         @foreach (var item in v_arrLSP)
         {
-                <tr>
-                    <td>@item.Ma_LSP</td>
-                    <td>@item.Ten_LSP</td>
-                    <td>@item.Ghi_Chu</td>
-                    <td>
-                        <button type="button"
-                                class="btn btn-success" @onclick="@(()=>EditLSP(item.Ma_LSP))">Edit</button>
-                        <button type="button"
-                                            class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
-                    </td>
+            <tr>
+                <td>@item.Ma_LSP</td>
+                <td>@item.Ten_LSP</td>
+                <td>@item.Ghi_Chu</td>
+                <td>
+                    <button type="button"
+                            class="btn btn-success" @onclick="@(()=>EditLSP(item.Ma_LSP))">Edit</button>
+                    <button type="button"
+                                        class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
+                </td>
 
-                </tr>
+            </tr>
         }
     </tbody>
 </table>
-<ConfirmDialog @ref="confirmDialog" OnConfirmed="HandleConfirm"></ConfirmDialog>
 <br />
-<!--Nút thêm mới-->
-<button 
-    type="button"
-    class="btn btn-primary"
-    @onclick="AddLSP">Thêm Loại Sản Phẩm</button>
+
 @code {
     private string v_strSearchTerm = string.Empty;
-    public List<CDM_Loai_San_Pham> v_arrLSP = new();
-    public CDM_Loai_San_Pham v_objLSP_For_Delete = new();
+    private List<CDM_Loai_San_Pham> v_arrLSP = new();
     CDM_Loai_San_Pham_Controller v_objLSPController = new();
-    private ConfirmBase confirmDialog;
     protected override void OnInitialized()
     {
         v_arrLSP = v_objLSPController.FQ_122_LSP_sp_sel_List_For_Cache();
@@ -72,40 +74,57 @@
     {
         NavigationManager.NavigateTo("/AddLSP");
     }
-    
+
     protected override void OnParametersSet()
     {
         //Nhớ Sửa thằng này xả list by name sử dụng parameter là v_strSearchTerm
         v_arrLSP = v_objLSPController.FQ_122_LSP_sp_sel_List_For_Cache();
 
     }
-    
+
     private void EditLSP(string Ma_LSP)
     {
         NavigationManager.NavigateTo($"/EditLSP/{Ma_LSP}");
     }
-    private void DeleteLSP(CDM_Loai_San_Pham LSP)
+    private int DeleteLSP(CDM_Loai_San_Pham LSP)
     {
+        int v_iRes = 0;
         try
         {
-            int v_iRes = v_objLSPController.FQ_122_LSP_sp_del_Delete_By_ID(LSP.Ma_LSP);
+            v_iRes = v_objLSPController.FQ_122_LSP_sp_del_Delete_By_ID(LSP.Ma_LSP);
             v_arrLSP.Remove(LSP);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             throw;
         }
+        return v_iRes;
+
     }
-    private void ShowConfirmation(CDM_Loai_San_Pham LSP)
+    private async Task ShowConfirmation(CDM_Loai_San_Pham v_objLSP)
     {
-        confirmDialog.Show();
-        v_objLSP_For_Delete = LSP;
-    }
-    private void HandleConfirm(bool value)
-    {
-        if (value)
+        //confirmDialog.Show();
+        var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You will not be able to recover this!",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                ConfirmButtonColor = "red",
+                CancelButtonText = "No, keep it"
+            });
+        if (!string.IsNullOrEmpty(result.Value))
         {
-            DeleteLSP(v_objLSP_For_Delete);
+            var v_iRes = DeleteLSP(v_objLSP);
+            if (v_iRes ==1){
+                await Swal.FireAsync(
+                  "Deleted",
+                  "Your data has been deleted.",
+                  SweetAlertIcon.Success
+                  );
+            }
         }
     }
+    
 }

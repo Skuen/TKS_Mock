@@ -2,7 +2,16 @@
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject SweetAlertService Swal
 <h3>Danh sách Kho</h3>
+<br />
+<!--Nút thêm mới-->
+<button type="button"
+        class="btn btn-primary"
+        @onclick="AddKho">
+    Thêm Kho
+</button>
+<br />
 <br />
 <!-- Thanh tìm kiếm -->
 <div class="input-group">
@@ -16,7 +25,7 @@
         Tìm kiếm
     </button>
 </div>
-
+<!-- Danh sách-->
 <table class="table"
     <thead>
         <tr>
@@ -28,35 +37,27 @@
     <tbody>
         @foreach (var item in v_arrKho)
         {
-                    <tr>
-                        <td>@item.Ma_Kho</td>
-                        <td>@item.Ten_Kho</td>
-                        <td>@item.Ghi_Chu</td>
-                        <td>
-                            <button type="button"
-                                        class="btn btn-success" @onclick="@(()=>EditKho(item.Ma_Kho))">Edit</button>
-                            <button type="button"
-                                                class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
-                        </td>
+            <tr>
+                <td>@item.Ma_Kho</td>
+                <td>@item.Ten_Kho</td>
+                <td>@item.Ghi_Chu</td>
+                <td>
+                    <button type="button"
+                                class="btn btn-success" @onclick="@(()=>EditKho(item.Ma_Kho))">Edit</button>
+                    <button type="button"
+                                        class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
+                </td>
 
-                    </tr>
+            </tr>
         }
     </tbody>
 </table>
-<ConfirmDialog @ref="confirmDialog" OnConfirmed="HandleConfirm"></ConfirmDialog>
 <br />
-<!--Nút thêm mới-->
-<button type="button"
-        class="btn btn-primary"
-        @onclick="AddKho">
-    Thêm Kho
-</button>
+
 @code {
     private string v_strSearchTerm = string.Empty;
     public List<CDM_Kho> v_arrKho = new();
-    public CDM_Kho v_objKho_For_Delete = new();
     CDM_Kho_Controller v_objKhoController = new();
-    private ConfirmBase confirmDialog;
 
     private void OnSearch()
     {
@@ -77,28 +78,44 @@
     {
         NavigationManager.NavigateTo($"/EditKho/{Ma_Kho}");
     }
-    private void DeleteKho(CDM_Kho Kho)
+    private int DeleteKho(CDM_Kho Kho)
     {
+        int v_iRes = 0;
         try
         {
-            int v_iRes = v_objKhoController.FQ_114_K_sp_del_Delete_By_ID(Kho.Ma_Kho);
+            v_iRes = v_objKhoController.FQ_114_K_sp_del_Delete_By_ID(Kho.Ma_Kho);
             v_arrKho.Remove(Kho);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             throw;
         }
+        return v_iRes;
     }
-    private void ShowConfirmation(CDM_Kho v_objKho)
+    private async Task ShowConfirmation(CDM_Kho v_objKho)
     {
-        confirmDialog.Show();
-        v_objKho_For_Delete = v_objKho;
-    }
-    private void HandleConfirm(bool value)
-    {
-        if (value)
+        var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You will not be able to recover this!",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                ConfirmButtonColor = "red",
+                CancelButtonText = "No, keep it"
+            });
+        if (!string.IsNullOrEmpty(result.Value))
         {
-            DeleteKho(v_objKho_For_Delete);
+            var v_iRes = DeleteKho(v_objKho);
+            if (v_iRes == 1)
+            {
+                await Swal.FireAsync(
+                  "Deleted",
+                  "Your data has been deleted.",
+                  SweetAlertIcon.Success
+                  );
+            }
         }
     }
+    
 }

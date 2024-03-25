@@ -1,0 +1,66 @@
+﻿@page "/AddDVT"
+
+@inject NavigationManager NavigationManager
+
+<h3>Thêm mới Đơn Vị Tính</h3>
+<br />
+
+<EditForm Model="v_objDVT" OnValidSubmit="InsertDVT">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div class="form-group">
+        <label for="id">Mã Đơn Vị Tính</label>
+        <InputText id="id" @bind-Value="v_objDVT.Ma_Don_Vi_Tinh" class="form-control"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="name">Tên Đơn Vị Tính</label>
+        <InputText id="name" @bind-Value="v_objDVT.Ten_Don_Vi_Tinh" class="form-control"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="note">Ghi Chú</label>
+        <InputText id="note" @bind-Value="v_objDVT.Ghi_Chu" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <button type="button" class="btn btn-primary" @onclick="BackToList">Quay Lại</button>
+</EditForm>
+
+@if (IsInserted)
+{
+    if (v_ires == 1)
+    {
+        <p class="alert alert-success">Thêm mới thành công</p>
+    }
+    else
+    {
+        <p class="alert alert-danger">Thêm mới thất bại</p>
+    }
+}
+@code {
+    private CDM_Don_Vi_Tinh v_objDVT = new();
+    private CDM_Don_Vi_Tinh_Controller v_objDVTController = new();
+    private bool IsInserted = false;
+    private int v_ires = 0;
+    private void InsertDVT()
+    {
+        if (this.v_objDVT != null)
+        {
+            try
+            {
+                IsInserted = true;
+                v_ires = v_objDVTController.FQ_110_DVT_sp_ins_Insert(v_objDVT);
+            }
+            catch (Exception ex)
+            {
+                v_ires = 0;
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+    }
+    private void BackToList()
+    {
+        NavigationManager.NavigateTo("/DVT");
+    }
+}

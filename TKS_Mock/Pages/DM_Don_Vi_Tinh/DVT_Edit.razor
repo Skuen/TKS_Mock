@@ -1,22 +1,22 @@
-﻿@page "/EditKho/{Ma_Kho}"
+﻿@page "/EditDVT/{Ma_DVT}"
 @inject NavigationManager NavigationManager
-<h3>Chỉnh sửa Kho</h3>
+<h3>Chỉnh sửa Đơn Vị Tính</h3>
 <br />
-<EditForm Model="v_objKho" OnValidSubmit="UpdateKho">
+<EditForm Model="v_objDVT" OnValidSubmit="UpdateDVT">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 
     <div class="form-group">
-        <label for="id">Mã Kho</label>
-        <InputText id="id" @bind-Value="v_objKho.Ma_Kho" class="form-control" readonly></InputText>
+        <label for="id">Mã Đơn Vị Tính</label>
+        <InputText id="id" @bind-Value="v_objDVT.Ma_Don_Vi_Tinh" class="form-control" readonly></InputText>
     </div>
     <div class="form-group">
-        <label for="name">Tên Kho</label>
-        <InputText id="name" @bind-Value="v_objKho.Ten_Kho" class="form-control"></InputText>
+        <label for="name">Tên Đơn Vị Tính</label>
+        <InputText id="name" @bind-Value="v_objDVT.Ten_Don_Vi_Tinh" class="form-control"></InputText>
     </div>
     <div class="form-group">
         <label for="note">Ghi Chú</label>
-        <InputText id="note" @bind-Value="v_objKho.Ghi_Chu" class="form-control"></InputText>
+        <InputText id="note" @bind-Value="v_objDVT.Ghi_Chu" class="form-control"></InputText>
     </div>
     <br />
     <button type="submit" class="btn btn-primary">Lưu</button>
@@ -35,29 +35,28 @@
         {
             <p class="alert alert-danger">@v_strArlertMessage</p>
         }
-
     }
 }
 @code {
     [Parameter]
-    public string Ma_Kho { get; set; }
-    private CDM_Kho v_objKho = new();
-    private CDM_Kho_Controller v_objKhoController = new();
+    public string Ma_DVT { get; set; }
+    private CDM_Don_Vi_Tinh v_objDVT = new();
+    private CDM_Don_Vi_Tinh_Controller v_objDVTController = new();
     private bool IsUpdated = false;
     private int v_ires = 0;
     private string v_strArlertMessage = string.Empty;
     protected override void OnInitialized()
     {
-        v_objKho = v_objKhoController.FQ_114_K_sp_sel_Get_By_ID(Ma_Kho);
+        v_objDVT = v_objDVTController.FQ_110_DVT_sp_sel_Get_By_ID(Ma_DVT);
     }
-    private void UpdateKho()
+    private void UpdateDVT()
     {
-        if (this.v_objKho != null)
+        if (this.v_objDVT != null)
         {
             try
             {
                 IsUpdated = true;
-                v_ires = v_objKhoController.FQ_114_K_sp_upd_Update(v_objKho);
+                v_ires = v_objDVTController.FQ_110_DVT_sp_upd_Update(v_objDVT);
             }
             catch (Exception ex)
             {
@@ -70,6 +69,6 @@
     }
     private void BackToList()
     {
-        NavigationManager.NavigateTo("/Kho");
+        NavigationManager.NavigateTo("/DVT");
     }
 }

@@ -1,15 +1,15 @@
-﻿@page "/NCC"
+﻿@page "/SP"
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject SweetAlertService Swal
-<h3>Danh sách Nhà cung cấp</h3>
+<h3>Danh sách Sản Phẩm</h3>
 <br />
 <!--Nút thêm mới-->
 <button type="button"
         class="btn btn-primary"
-        @onclick="AddNCC">
-    Thêm Nhà cung cấp
+        @onclick="AddSP">
+    Thêm Sản Phẩm
 </button>
 <br />
 <br />
@@ -17,7 +17,7 @@
 <div class="input-group">
     <input type="text"
            class="form-control"
-           placeholder="Điền tên nhà cung cấp để tìm kiếm"
+           placeholder="Điền tên sản phẩm để tìm kiếm"
            @bind-value="v_strSearchTerm" />
     <button type="button"
             class="btn-success input-group-text"
@@ -29,21 +29,25 @@
 <table class="table"
     <thead>
         <tr>
-            <th>Mã NCC</th>
-            <th>Tên NCC</th>
+            <th>Mã Sản Phẩm</th>
+            <th>Tên Sản Phẩm</th>
+            <th>Loại Sản Phẩm</th>
+            <th>Đơn Vị Tính</th>
             <th>Ghi Chú</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in v_arrNCC)
+        @foreach (var item in v_arrSP)
         {
             <tr>
-                <td>@item.Ma_NCC</td>
-                <td>@item.Ten_NCC</td>
+                <td>@item.Ma_San_Pham</td>
+                <td>@item.Ten_San_Pham</td>
+                <td>@v_objLSPController.FQ_122_LSP_sp_sel_Get_By_ID(item.Loai_San_Pham_ID).Ten_LSP</td>
+                <td>@v_objDVTController.FQ_110_DVT_sp_sel_Get_By_ID(item.Don_Vi_Tinh_ID).Ten_Don_Vi_Tinh</td>
                 <td>@item.Ghi_Chu</td>
                 <td>
                     <button type="button"
-                                class="btn btn-success" @onclick="@(()=>EditNCC(item.Ma_NCC))">Edit</button>
+                                class="btn btn-success" @onclick="@(()=>EditDVT(item.Ma_San_Pham))">Edit</button>
                     <button type="button"
                                         class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
                 </td>
@@ -55,36 +59,40 @@
 <br />
 
 @code {
+    //depencies
+    CDM_San_Pham_Controller v_objSPController = new();
+    CDM_Don_Vi_Tinh_Controller v_objDVTController = new();
+    CDM_Loai_San_Pham_Controller v_objLSPController = new();
+    //variables
+    public List<CDM_San_Pham> v_arrSP = new();
     private string v_strSearchTerm = string.Empty;
-    public List<CDM_NCC> v_arrNCC = new();
-    CDM_NCC_Controller v_objNCCController = new();
-
+    //functions
+    private void AddSP()
+    {
+        NavigationManager.NavigateTo("/AddSP");
+    }
     private void OnSearch()
     {
         if (string.IsNullOrEmpty(v_strSearchTerm))
         {
-            v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
+            v_arrSP = v_objSPController.FQ_165_SP_sp_sel_List_For_Cache();
         }
-    }
-    private void AddNCC()
-    {
-        NavigationManager.NavigateTo("/AddNCC");
     }
     protected override void OnInitialized()
     {
-        v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
+        v_arrSP = v_objSPController.FQ_165_SP_sp_sel_List_For_Cache();
     }
-    private void EditNCC(string Ma_NCC)
+    private void EditDVT(string Ma_SP)
     {
-        NavigationManager.NavigateTo($"/EditNCC/{Ma_NCC}");
+        NavigationManager.NavigateTo($"/EditSP/{Ma_SP}");
     }
-    private int DeleteNCC(CDM_NCC v_objNCC)
+    private int DeleteSP(CDM_San_Pham v_objSP)
     {
         int v_iRes = 0;
         try
         {
-            v_iRes = v_objNCCController.FQ_123_N_sp_del_Delete_By_ID(v_objNCC.Ma_NCC);
-            v_arrNCC.Remove(v_objNCC);
+            v_iRes = v_objSPController.FQ_165_SP_sp_del_Delete_By_ID(v_objSP.Ma_San_Pham);
+            v_arrSP.Remove(v_objSP);
         }
         catch (Exception)
         {
@@ -92,8 +100,9 @@
         }
         return v_iRes;
     }
-    private async Task ShowConfirmation(CDM_NCC v_objNCC)
+    private async Task ShowConfirmation(CDM_San_Pham v_objSP)
     {
+
         var result = await Swal.FireAsync(new SweetAlertOptions
             {
                 Title = "Are you sure?",
@@ -106,7 +115,7 @@
             });
         if (!string.IsNullOrEmpty(result.Value))
         {
-            var v_iRes = DeleteNCC(v_objNCC);
+            var v_iRes = DeleteSP(v_objSP);
             if (v_iRes == 1)
             {
                 await Swal.FireAsync(
@@ -117,6 +126,4 @@
             }
         }
     }
-    
-
 }

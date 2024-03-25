@@ -1,15 +1,15 @@
-﻿@page "/NCC"
+﻿@page "/DVT"
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject SweetAlertService Swal
-<h3>Danh sách Nhà cung cấp</h3>
+<h3>Danh sách Đơn Vị Tính</h3>
 <br />
 <!--Nút thêm mới-->
 <button type="button"
         class="btn btn-primary"
-        @onclick="AddNCC">
-    Thêm Nhà cung cấp
+        @onclick="AddDVT">
+    Thêm Đơn Vị Tính
 </button>
 <br />
 <br />
@@ -17,7 +17,7 @@
 <div class="input-group">
     <input type="text"
            class="form-control"
-           placeholder="Điền tên nhà cung cấp để tìm kiếm"
+           placeholder="Điền tên đơn vị tính để tìm kiếm"
            @bind-value="v_strSearchTerm" />
     <button type="button"
             class="btn-success input-group-text"
@@ -25,25 +25,26 @@
         Tìm kiếm
     </button>
 </div>
+
 <!-- Danh sách-->
 <table class="table"
     <thead>
         <tr>
-            <th>Mã NCC</th>
-            <th>Tên NCC</th>
+            <th>Mã Đơn Vị Tính</th>
+            <th>Tên Đơn Vị Tính</th>
             <th>Ghi Chú</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in v_arrNCC)
+        @foreach (var item in v_arrDVT)
         {
             <tr>
-                <td>@item.Ma_NCC</td>
-                <td>@item.Ten_NCC</td>
+                <td>@item.Ma_Don_Vi_Tinh</td>
+                <td>@item.Ten_Don_Vi_Tinh</td>
                 <td>@item.Ghi_Chu</td>
                 <td>
                     <button type="button"
-                                class="btn btn-success" @onclick="@(()=>EditNCC(item.Ma_NCC))">Edit</button>
+                                class="btn btn-success" @onclick="@(()=>EditDVT(item.Ma_Don_Vi_Tinh))">Edit</button>
                     <button type="button"
                                         class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
                 </td>
@@ -54,37 +55,38 @@
 </table>
 <br />
 
+
 @code {
     private string v_strSearchTerm = string.Empty;
-    public List<CDM_NCC> v_arrNCC = new();
-    CDM_NCC_Controller v_objNCCController = new();
+    public List<CDM_Don_Vi_Tinh> v_arrDVT = new();
+    CDM_Don_Vi_Tinh_Controller v_objDVTController = new();
 
     private void OnSearch()
     {
         if (string.IsNullOrEmpty(v_strSearchTerm))
         {
-            v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
+            v_arrDVT = v_objDVTController.FQ_110_DVT_sp_sel_List_For_Cache();
         }
-    }
-    private void AddNCC()
-    {
-        NavigationManager.NavigateTo("/AddNCC");
     }
     protected override void OnInitialized()
     {
-        v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
+        v_arrDVT = v_objDVTController.FQ_110_DVT_sp_sel_List_For_Cache();
     }
-    private void EditNCC(string Ma_NCC)
+    private void AddDVT()
     {
-        NavigationManager.NavigateTo($"/EditNCC/{Ma_NCC}");
+        NavigationManager.NavigateTo("/AddDVT");
     }
-    private int DeleteNCC(CDM_NCC v_objNCC)
+    private void EditDVT(string Ma_DVT)
+    {
+        NavigationManager.NavigateTo($"/EditDVT/{Ma_DVT}");
+    }
+    private int DeleteDVT(CDM_Don_Vi_Tinh v_objDVT)
     {
         int v_iRes = 0;
         try
         {
-            v_iRes = v_objNCCController.FQ_123_N_sp_del_Delete_By_ID(v_objNCC.Ma_NCC);
-            v_arrNCC.Remove(v_objNCC);
+            v_iRes = v_objDVTController.FQ_110_DVT_sp_del_Delete_By_ID(v_objDVT.Ma_Don_Vi_Tinh);
+            v_arrDVT.Remove(v_objDVT);
         }
         catch (Exception)
         {
@@ -92,8 +94,9 @@
         }
         return v_iRes;
     }
-    private async Task ShowConfirmation(CDM_NCC v_objNCC)
+    private async Task ShowConfirmation(CDM_Don_Vi_Tinh v_objDVT)
     {
+
         var result = await Swal.FireAsync(new SweetAlertOptions
             {
                 Title = "Are you sure?",
@@ -106,7 +109,7 @@
             });
         if (!string.IsNullOrEmpty(result.Value))
         {
-            var v_iRes = DeleteNCC(v_objNCC);
+            var v_iRes = DeleteDVT(v_objDVT);
             if (v_iRes == 1)
             {
                 await Swal.FireAsync(
@@ -118,5 +121,4 @@
         }
     }
     
-
 }

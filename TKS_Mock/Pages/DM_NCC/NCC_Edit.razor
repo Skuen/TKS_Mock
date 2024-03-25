@@ -31,7 +31,10 @@
     else
     {
         <p class="alert alert-danger">Cập nhập thất bại</p>
-        <p class="alert alert-danger">@v_strArlertMessage</p>
+        if (!string.IsNullOrEmpty(v_strArlertMessage))
+        {
+            <p class="alert alert-danger">@v_strArlertMessage</p>
+        }
 
     }
 }

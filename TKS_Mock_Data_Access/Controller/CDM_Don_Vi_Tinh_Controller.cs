@@ -102,12 +102,12 @@ namespace TKS_Mock_Data_Access.Controller
 
             return v_objRes;
         }
-        public int FQ_110_DVT_sp_del_Delete_By_ID(long p_iAuto_ID)
+        public int FQ_110_DVT_sp_del_Delete_By_ID(string p_iAuto_ID)
         {
             int v_iRes = CConst.INT_VALUE_NULL;
             try
             {
-                CSqlHelper.ExecuteNonquery(CConfig.TKS_Mock_Conn_String, "FQ_110_DVT_sp_del_Delete_By_ID", p_iAuto_ID);
+                v_iRes = CSqlHelper.ExecuteNonquery(CConfig.TKS_Mock_Conn_String, "FQ_110_DVT_sp_del_Delete_By_ID", p_iAuto_ID);
             }
 
             catch (Exception ex)

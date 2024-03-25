@@ -1,0 +1,103 @@
+﻿@page "/EditSP/{Ma_SP}"
+@inject NavigationManager NavigationManager
+<h3>Chỉnh sửa Sản Phẩm</h3>
+<br />
+<EditForm Model="v_objSP" OnValidSubmit="UpdateSP">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <div class="form-group">
+        <label for="id">Mã Sản Phẩm</label>
+        <InputText id="id" @bind-Value="v_objSP.Ma_San_Pham" class="form-control" readonly></InputText>
+    </div>
+    <div class="form-group">
+        <label for="name">Tên Sản Phẩm</label>
+        <InputText id="name" @bind-Value="v_objSP.Ten_San_Pham" class="form-control"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="LSP">Loại Sản Phẩm</label>
+        <select id="LSP" @bind="v_objSP.Loai_San_Pham_ID" class="form-control">
+            <option value="" disabled>Hãy chọn Loại sản phẩm</option>
+            @foreach (var item in v_arrLSP)
+            {
+                <option value="@item.Ma_LSP">@item.Ten_LSP</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="DVT">Đơn vị tính</label>
+        <select id="DVT" @bind="v_objSP.Don_Vi_Tinh_ID" class="form-control">
+            <option value="" disabled>Hãy chọn Đơn vị tính</option>
+            @foreach (var item in v_arrDVT)
+            {
+                <option value="@item.Ma_Don_Vi_Tinh">@item.Ten_Don_Vi_Tinh</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="note">Ghi Chú</label>
+        <InputText id="note" @bind-Value="v_objSP.Ghi_Chu" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <button type="button" class="btn btn-primary" @onclick="BackToList">Quay Lại</button>
+
+</EditForm>
+@if (IsUpdated)
+{
+    if (v_ires == 1)
+    {
+        <p class="alert alert-success">Cập nhập thành công</p>
+    }
+    else
+    {
+        <p class="alert alert-danger">Cập nhập thất bại</p>
+        if (!string.IsNullOrEmpty(v_strArlertMessage))
+        {
+            <p class="alert alert-danger">@v_strArlertMessage</p>
+        }
+    }
+}
+@code {
+    [Parameter]
+    public string Ma_SP { get; set; }
+    //depencies
+    private CDM_San_Pham_Controller v_objSPController = new();
+    private CDM_Don_Vi_Tinh_Controller v_objDVTController = new();
+    private CDM_Loai_San_Pham_Controller v_objLSPController = new();
+    //vairables
+    private CDM_San_Pham v_objSP = new();
+    public List<CDM_Don_Vi_Tinh> v_arrDVT = new();
+    private List<CDM_Loai_San_Pham> v_arrLSP = new();
+    private bool IsUpdated = false;
+    private int v_ires = 0;
+    private string v_strArlertMessage = string.Empty;
+    //functions
+    protected override void OnInitialized()
+    {
+        v_objSP = v_objSPController.FQ_165_SP_sp_sel_Get_By_ID(Ma_SP);
+        v_arrDVT = v_objDVTController.FQ_110_DVT_sp_sel_List_For_Cache();
+        v_arrLSP = v_objLSPController.FQ_122_LSP_sp_sel_List_For_Cache();
+    }
+    private void UpdateSP()
+    {
+        if (this.v_objSP != null)
+        {
+            try
+            {
+                IsUpdated = true;
+                v_ires = v_objSPController.FQ_165_SP_sp_upd_Update(v_objSP);
+            }
+            catch (Exception ex)
+            {
+                v_ires = 0;
+                v_strArlertMessage = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+    }
+    private void BackToList()
+    {
+        NavigationManager.NavigateTo("/SP");
+    }
+}
