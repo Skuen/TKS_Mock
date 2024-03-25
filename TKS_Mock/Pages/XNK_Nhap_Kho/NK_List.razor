@@ -1,0 +1,146 @@
+﻿@page "/NK"
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject SweetAlertService Swal
+<h3>Danh sách Phiếu Nhập</h3>
+<br />
+<!--Nút thêm mới-->
+<button type="button"
+        class="btn btn-primary"
+        @onclick="AddNK">
+    Thêm Phiếu Nhập
+</button>
+<br />
+<br />
+<!-- Thanh tìm kiếm -->
+<div class="input-group">
+    <input type="text"
+           class="form-control"
+           placeholder="Điền tên phiếu nhập để tìm kiếm"
+           @bind-value="v_strSearchTerm" />
+    <button type="button"
+            class="btn-success input-group-text"
+            @onclick="OnSearch">
+        Tìm kiếm
+    </button>
+</div>
+<!-- Danh sách-->
+<table class="table"
+    <thead>
+        <tr>
+            <th>Số Phiếu Nhập Kho</th>
+            <th>Kho</th>
+            <th>Nhà cung cấp</th>
+            <th>Ngày nhập kho</th>
+            <th>Ghi Chú</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in v_arrNK)
+        {
+                <tr>
+                    <td>@item.So_Phieu_Nhap_Kho</td>
+                    <td>@v_objKhoController.FQ_114_K_sp_sel_Get_By_ID(item.Kho_ID).Ten_Kho</td>
+                    <td>@v_objNCCController.FQ_123_N_sp_sel_Get_By_ID(item.NCC_ID).Ten_NCC</td>
+                    <td>@(item.Ngay_Nhap_Kho.HasValue ? item.Ngay_Nhap_Kho.Value.ToString("HH:mm:ss  dd/MM/yyyy") : "")</td>
+                    <td>@item.Ghi_Chu</td>
+                    <td>
+                        <button type="button"
+                                    class="btn btn-success" @onclick="@(()=>EditNK(item.So_Phieu_Nhap_Kho))">Edit</button>
+                        <button type="button"
+                                            class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
+                    </td>
+
+                </tr>
+        }
+    </tbody>
+</table>
+<br />
+
+@code {
+    //depencies
+    CXNK_Nhap_Kho_Controller v_objNKController = new();
+    CDM_Kho_Controller v_objKhoController = new();
+    CDM_NCC_Controller v_objNCCController = new();
+    //variables
+    public List<CXNK_Nhap_Kho> v_arrNK = new();
+    private string v_strSearchTerm = string.Empty;
+    //functions
+    protected override void OnInitialized()
+    {
+        v_arrNK = v_objNKController.FQ_718_NK_sp_sel_List_For_Cache();
+    }
+
+    private void OnSearch()
+    {
+        if (string.IsNullOrEmpty(v_strSearchTerm))
+        {
+            v_arrNK = v_objNKController.FQ_718_NK_sp_sel_List_For_Cache();
+        }
+    }
+
+    private void AddNK()
+    {
+        NavigationManager.NavigateTo("/AddNK");
+    }
+
+    private void EditNK(string Ma_NK)
+    {
+        NavigationManager.NavigateTo($"/EditNK/{Ma_NK}");
+    }
+
+    private async Task ShowConfirmation(CXNK_Nhap_Kho v_objNK)
+    {
+
+        var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You will not be able to recover this!",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                ConfirmButtonColor = "red",
+                CancelButtonText = "No, keep it"
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            //v_iRes = số row bị ảnh hưởng dưới database
+            var v_iRes = DeleteNK(v_objNK);
+            //Có ít nhất 1 row bị ảnh hưởng
+            if (v_iRes > 0)
+            {
+                await Swal.FireAsync(
+                  "Deleted",
+                  "Your data has been deleted.",
+                  SweetAlertIcon.Success
+                  );
+            }
+            //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
+            if (v_iRes == 0 || v_iRes == -1)
+            {
+                await Swal.FireAsync(
+                  "Cancelled",
+                  "Something wrong happened",
+                  SweetAlertIcon.Error
+                  );
+            }
+        }
+    }
+
+    private int DeleteNK(CXNK_Nhap_Kho v_objNK)
+    {
+        int v_iRes = 0;
+        try
+        {
+            v_iRes = v_objNKController.FQ_718_NK_sp_del_Delete_By_ID(v_objNK.So_Phieu_Nhap_Kho);
+            v_arrNK.Remove(v_objNK);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        return v_iRes;
+    }
+
+}

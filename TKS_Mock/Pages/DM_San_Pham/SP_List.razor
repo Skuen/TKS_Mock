@@ -47,7 +47,7 @@
                 <td>@item.Ghi_Chu</td>
                 <td>
                     <button type="button"
-                                class="btn btn-success" @onclick="@(()=>EditDVT(item.Ma_San_Pham))">Edit</button>
+                                class="btn btn-success" @onclick="@(()=>EditSP(item.Ma_San_Pham))">Edit</button>
                     <button type="button"
                                         class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
                 </td>
@@ -82,7 +82,7 @@
     {
         v_arrSP = v_objSPController.FQ_165_SP_sp_sel_List_For_Cache();
     }
-    private void EditDVT(string Ma_SP)
+    private void EditSP(string Ma_SP)
     {
         NavigationManager.NavigateTo($"/EditSP/{Ma_SP}");
     }
@@ -116,12 +116,22 @@
         if (!string.IsNullOrEmpty(result.Value))
         {
             var v_iRes = DeleteSP(v_objSP);
-            if (v_iRes == 1)
+            //Có ít nhất 1 row bị ảnh hưởng
+            if (v_iRes > 0)
             {
                 await Swal.FireAsync(
                   "Deleted",
                   "Your data has been deleted.",
                   SweetAlertIcon.Success
+                  );
+            }
+            //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
+            if (v_iRes == 0 || v_iRes == -1)
+            {
+                await Swal.FireAsync(
+                  "Cancelled",
+                  "Something wrong happened",
+                  SweetAlertIcon.Error
                   );
             }
         }

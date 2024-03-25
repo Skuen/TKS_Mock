@@ -1,0 +1,104 @@
+﻿@page "/EditNK/{Ma_NK}"
+@inject NavigationManager NavigationManager
+<h3>Chỉnh sửa Phiếu Nhập Kho</h3>
+<br />
+<EditForm Model="v_objNK" OnValidSubmit="UpdateNK">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <div class="form-group mb-2">
+        <label for="id">Số Phiếu Nhập Kho</label>
+        <InputText id="id" @bind-Value="v_objNK.So_Phieu_Nhap_Kho" class="form-control" readonly></InputText>
+    </div>
+    <div class="form-group mb-2">
+        <label for="Kho">Kho</label>
+        <select id="Kho" @bind="v_objNK.Kho_ID" class="form-control">
+            <option value="" disabled>Hãy chọn Kho</option>
+            @foreach (var item in v_arrKho)
+            {
+                <option value="@item.Ma_Kho">@item.Ten_Kho</option>
+            }
+        </select>
+    </div>
+    <div class="form-group mb-2">
+        <label for="NCC">Nhà cung cấp</label>
+        <select id="NCC" @bind="v_objNK.NCC_ID" class="form-control">
+            <option value="" disabled>Hãy chọn Nhà cung cấp</option>
+            @foreach (var item in v_arrNCC)
+            {
+                <option value="@item.Ma_NCC">@item.Ten_NCC</option>
+            }
+        </select>
+
+    </div>
+    <div class="form-group mb-2">
+        <label>Ngày nhập kho: </label>
+        <label>@(v_objNK.Ngay_Nhap_Kho.HasValue ? v_objNK.Ngay_Nhap_Kho.Value.ToString("HH:mm:ss  dd/MM/yyyy") : "")</label>
+    </div>
+    <div class="form-group mb-2">
+        <label for="note">Ghi Chú</label>
+        <InputText id="note" @bind-Value="v_objNK.Ghi_Chu" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <button type="button" class="btn btn-primary" @onclick="BackToList">Quay Lại</button>
+
+</EditForm>
+@if (IsUpdated)
+{
+    if (v_ires == 1)
+    {
+        <p class="alert alert-success">Cập nhập thành công</p>
+    }
+    else
+    {
+        <p class="alert alert-danger">Cập nhập thất bại</p>
+        if (!string.IsNullOrEmpty(v_strArlertMessage))
+        {
+            <p class="alert alert-danger">@v_strArlertMessage</p>
+        }
+    }
+}
+@code {
+    [Parameter]
+    public string Ma_NK { get; set; }
+    //depencies
+    private CXNK_Nhap_Kho_Controller v_objNKController = new();
+    private CDM_Kho_Controller v_objKhoController = new();
+    private CDM_NCC_Controller v_objNCCController = new();
+    //vairables
+    private CXNK_Nhap_Kho v_objNK = new();
+    public List<CDM_Kho> v_arrKho = new();
+    private List<CDM_NCC> v_arrNCC = new();
+    private bool IsUpdated = false;
+    private int v_ires = 0;
+    private string v_strArlertMessage = string.Empty;
+    //functions
+    protected override void OnInitialized()
+    {
+        v_objNK = v_objNKController.FQ_718_NK_sp_sel_Get_By_ID(Ma_NK);
+        v_arrKho = v_objKhoController.FQ_114_K_sp_sel_List_For_Cache();
+        v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
+    }
+    private void UpdateNK()
+    {
+        if (this.v_objNK != null)
+        {
+            try
+            {
+                IsUpdated = true;
+                v_ires = v_objNKController.FQ_718_NK_sp_upd_Update(v_objNK);
+            }
+            catch (Exception ex)
+            {
+                v_ires = 0;
+                v_strArlertMessage = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+    }
+    private void BackToList()
+    {
+        NavigationManager.NavigateTo("/NK");
+    }
+}

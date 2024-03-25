@@ -464,7 +464,7 @@ namespace TKS_Mock_Data_Access.DataLayer
                 da.Fill(p_dtData);
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }

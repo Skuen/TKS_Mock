@@ -107,12 +107,22 @@
         if (!string.IsNullOrEmpty(result.Value))
         {
             var v_iRes = DeleteKho(v_objKho);
-            if (v_iRes == 1)
+            //Có ít nhất 1 row bị ảnh hưởng
+            if (v_iRes > 0)
             {
                 await Swal.FireAsync(
                   "Deleted",
                   "Your data has been deleted.",
                   SweetAlertIcon.Success
+                  );
+            }
+            //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
+            if (v_iRes == 0 || v_iRes == -1)
+            {
+                await Swal.FireAsync(
+                  "Cancelled",
+                  "Something wrong happened",
+                  SweetAlertIcon.Error
                   );
             }
         }

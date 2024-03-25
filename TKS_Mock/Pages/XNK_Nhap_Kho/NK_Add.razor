@@ -1,0 +1,93 @@
+﻿@page "/AddNK"
+@inject NavigationManager NavigationManager
+
+<h3>Thêm mới Phiếu nhập</h3>
+<br />
+<EditForm Model="v_objNK" OnValidSubmit="InsertNK">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div class="form-group">
+        <label for="id">Số Phiếu Nhập Kho</label>
+        <InputText id="id" @bind-Value="v_objNK.So_Phieu_Nhap_Kho" class="form-control"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="Kho">Kho</label>
+        <select id="Kho" @bind="v_objNK.Kho_ID" class="form-control">
+            <option value="" selected disabled>Hãy chọn Kho</option>
+            @foreach (var item in v_arrKho)
+            {
+                <option value="@item.Ma_Kho">@item.Ten_Kho</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="NCC">Nhà cung cấp</label>
+        <select id="NCC" @bind="v_objNK.NCC_ID" class="form-control">
+            <option value="" selected disabled>Hãy chọn Nhà cung cấp</option>
+            @foreach (var item in v_arrNCC)
+            {
+                <option value="@item.Ma_NCC">@item.Ten_NCC</option>
+            }
+        </select>
+
+    </div>
+    <div class="form-group">
+        <label for="note">Ghi Chú</label>
+        <InputText id="note" @bind-Value="v_objNK.Ghi_Chu" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <button type="button" class="btn btn-primary" @onclick="BackToList">Quay Lại</button>
+</EditForm>
+
+@if (IsInserted)
+{
+    if (v_ires == 1)
+    {
+        <p class="alert alert-success">Thêm mới thành công</p>
+    }
+    else
+    {
+        <p class="alert alert-danger">Thêm mới thất bại</p>
+    }
+}
+@code {
+    //Depencies
+    private CXNK_Nhap_Kho_Controller v_objNKController = new();
+    private CDM_Kho_Controller v_objKhoController = new();
+    private CDM_NCC_Controller v_objNCCController = new();
+    //variables
+    private CXNK_Nhap_Kho v_objNK = new();
+    public List<CDM_Kho> v_arrKho = new();
+    private List<CDM_NCC> v_arrNCC = new();
+    private bool IsInserted = false;
+    private int v_ires = 0;
+    //Function
+    protected override void OnInitialized()
+    {
+        v_arrKho = v_objKhoController.FQ_114_K_sp_sel_List_For_Cache();
+        v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
+    }
+    private void InsertNK()
+    {
+        if (this.v_objNK != null)
+        {
+            try
+            {
+                IsInserted = true;
+                v_ires = v_objNKController.FQ_718_NK_sp_ins_Insert(v_objNK);
+            }
+            catch (Exception ex)
+            {
+                v_ires = 0;
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+    }
+    private void BackToList()
+    {
+        NavigationManager.NavigateTo("/NK");
+    }
+}
