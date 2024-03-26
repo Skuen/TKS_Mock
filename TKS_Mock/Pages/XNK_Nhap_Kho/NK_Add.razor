@@ -1,5 +1,6 @@
 ﻿@page "/AddNK"
 @inject NavigationManager NavigationManager
+@inject SweetAlertService Swal
 
 <h3>Thêm mới Phiếu nhập</h3>
 <br />
@@ -36,47 +37,136 @@
         <label for="note">Ghi Chú</label>
         <InputText id="note" @bind-Value="v_objNK.Ghi_Chu" class="form-control"></InputText>
     </div>
+
+    <div class="form-group">    
+        <label for="SP">Sản Phẩm</label>
+        <TelerikMultiSelect  @ref="multiSelect" Data=@v_arrSP
+                            TextField="Ten_San_Pham" ValueField="Ma_San_Pham"
+                            @bind-Value="@v_arrSelectedValues" OnChange="MapToRawData"
+                            ClearButton="true" Filterable="true">
+        </TelerikMultiSelect>
+    </div>
     <br />
-    <button type="submit" class="btn btn-primary">Lưu</button>
+    <button type="submit" class="btn btn-primary" @onclick="InsertNK">Lưu</button>
     <button type="button" class="btn btn-primary" @onclick="BackToList">Quay Lại</button>
 </EditForm>
-
-@if (IsInserted)
+@if (v_arrSelectedValues.Count > 0)
 {
-    if (v_ires == 1)
-    {
-        <p class="alert alert-success">Thêm mới thành công</p>
-    }
-    else
-    {
-        <p class="alert alert-danger">Thêm mới thất bại</p>
-    }
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mã Sản phẩm</th>
+                <th>Tên Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Trị giá</th>
+            </tr>
+        </thead>
+        @foreach (var item in v_arrNKRD)
+        {
+            <tr>
+                <td>@item.San_Pham_ID</td>
+                <td>@v_objSPController.FQ_165_SP_sp_sel_Get_By_ID(item.San_Pham_ID).Ten_San_Pham</td>
+                <td><TelerikNumericTextBox Format="0" Min="1" @bind-Value="@item.SL_Nhap"></TelerikNumericTextBox></td>
+                <td><TelerikNumericTextBox Format="C" Min="0.01" @bind-Value="@item.Don_Gia_Nhap"></TelerikNumericTextBox></td>
+                <td><label>@string.Format("{0:C}", Math.Round((item.Don_Gia_Nhap * item.SL_Nhap), 2))</label></td>
+                <button type="button" class="btn btn-danger"
+                @onclick="@(()=>RemoveItemFromSelect(item.San_Pham_ID))">Remove</button>
+            </tr>
+        }
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Tổng tiền:</td>
+            <td><label>@string.Format("{0:C}", Math.Round((GetTotalSum()), 2))</label></td>
+        </tr>
+    </table>
 }
+
 @code {
     //Depencies
     private CXNK_Nhap_Kho_Controller v_objNKController = new();
+    private CXNK_Nhap_Kho_Raw_Data_Controller v_objNKRDController = new();
     private CDM_Kho_Controller v_objKhoController = new();
     private CDM_NCC_Controller v_objNCCController = new();
+    private CDM_San_Pham_Controller v_objSPController = new();
     //variables
     private CXNK_Nhap_Kho v_objNK = new();
-    public List<CDM_Kho> v_arrKho = new();
+    private List<CXNK_Nhap_Kho_Raw_Data> v_arrNKRD = new();
+    private List<CDM_Kho> v_arrKho = new();
     private List<CDM_NCC> v_arrNCC = new();
-    private bool IsInserted = false;
     private int v_ires = 0;
+    //variables for multiple select
+    private List<CDM_San_Pham> v_arrSP = new();
+    private List<string> v_arrSelectedValues = new();
+    private List<string> v_arrPreviousSelected = new();
+    Telerik.Blazor.Components.TelerikMultiSelect<CDM_San_Pham, string> multiSelect = new();
+
     //Function
     protected override void OnInitialized()
     {
         v_arrKho = v_objKhoController.FQ_114_K_sp_sel_List_For_Cache();
         v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
+        v_arrSP = v_objSPController.FQ_165_SP_sp_sel_List_For_Cache();
     }
-    private void InsertNK()
+    private void BackToList()
+    {
+        NavigationManager.NavigateTo("/NK");
+    }
+    private double GetTotalSum()
+    {
+        double v_dSum = 0;
+        foreach(var item in v_arrNKRD)
+        {
+            v_dSum += item.Don_Gia_Nhap * item.SL_Nhap;
+        }
+        return v_dSum;
+    }
+    private void MapToRawData()
+    {
+        var itemsToInsert = v_arrSelectedValues.Except(v_arrPreviousSelected).ToList();
+        var itemsToDelete = v_arrPreviousSelected.Except(v_arrSelectedValues).ToList();
+        foreach (var item_id in itemsToInsert)
+        {
+            v_arrNKRD.Add(new CXNK_Nhap_Kho_Raw_Data
+                {
+                    San_Pham_ID = item_id,
+                    SL_Nhap = 1,
+                    Don_Gia_Nhap = 1
+                });
+        }
+
+        foreach (var item_id in itemsToDelete)
+        {
+            v_arrNKRD.RemoveAll(item => item.San_Pham_ID == item_id);
+        }
+        v_arrPreviousSelected = v_arrSelectedValues;
+    }
+    private void RemoveItemFromSelect(string p_strSP_Id)
+    {
+        v_arrSelectedValues.Remove(p_strSP_Id);
+        v_arrPreviousSelected = v_arrSelectedValues;
+        multiSelect.Rebind();
+        v_arrNKRD.RemoveAll(item => item.San_Pham_ID == p_strSP_Id);
+    }
+    private async Task InsertNK()
     {
         if (this.v_objNK != null)
         {
             try
             {
-                IsInserted = true;
                 v_ires = v_objNKController.FQ_718_NK_sp_ins_Insert(v_objNK);
+                InsertNKRD();
+                if(v_ires > 0)
+                {
+                    await Swal.FireAsync(
+                      "Insert all completed",
+                      "Your data has been added.",
+                      SweetAlertIcon.Success
+                      );
+                    NavigationManager.NavigateTo("/NK");
+                }
             }
             catch (Exception ex)
             {
@@ -86,8 +176,21 @@
 
         }
     }
-    private void BackToList()
+    private void InsertNKRD()
     {
-        NavigationManager.NavigateTo("/NK");
+        foreach(var item in v_arrNKRD)
+        {
+            try
+            {
+                item.Nhap_Kho_ID = v_objNK.So_Phieu_Nhap_Kho;
+                v_ires = v_objNKRDController.FQ_719_NKRD_sp_ins_Insert(item);
+            }
+            catch(Exception)
+            {
+                v_ires = 0;
+                break;
+            }
+        }
     }
+
 }

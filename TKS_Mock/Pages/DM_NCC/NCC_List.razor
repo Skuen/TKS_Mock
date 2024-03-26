@@ -84,11 +84,10 @@
         try
         {
             v_iRes = v_objNCCController.FQ_123_N_sp_del_Delete_By_ID(v_objNCC.Ma_NCC);
-            v_arrNCC.Remove(v_objNCC);
         }
         catch (Exception)
         {
-            throw;
+            return v_iRes;
         }
         return v_iRes;
     }
@@ -115,6 +114,8 @@
                   "Your data has been deleted.",
                   SweetAlertIcon.Success
                   );
+                v_arrNCC.Remove(v_objNCC);
+
             }
             //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
             if (v_iRes == 0 || v_iRes == -1)

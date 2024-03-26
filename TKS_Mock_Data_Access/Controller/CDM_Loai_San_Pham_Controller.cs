@@ -115,7 +115,7 @@ namespace TKS_Mock_Data_Access.Controller
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                throw;
+                return v_iRes;
             }
 
             return v_iRes;

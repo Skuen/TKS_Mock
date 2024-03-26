@@ -92,11 +92,10 @@
         try
         {
             v_iRes = v_objSPController.FQ_165_SP_sp_del_Delete_By_ID(v_objSP.Ma_San_Pham);
-            v_arrSP.Remove(v_objSP);
         }
         catch (Exception)
         {
-            throw;
+            return v_iRes;
         }
         return v_iRes;
     }
@@ -124,6 +123,7 @@
                   "Your data has been deleted.",
                   SweetAlertIcon.Success
                   );
+                v_arrSP.Remove(v_objSP);
             }
             //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
             if (v_iRes == 0 || v_iRes == -1)

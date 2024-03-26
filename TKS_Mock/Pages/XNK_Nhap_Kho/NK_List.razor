@@ -115,6 +115,7 @@
                   "Your data has been deleted.",
                   SweetAlertIcon.Success
                   );
+                v_arrNK.Remove(v_objNK);
             }
             //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
             if (v_iRes == 0 || v_iRes == -1)
@@ -134,11 +135,10 @@
         try
         {
             v_iRes = v_objNKController.FQ_718_NK_sp_del_Delete_By_ID(v_objNK.So_Phieu_Nhap_Kho);
-            v_arrNK.Remove(v_objNK);
         }
         catch (Exception)
         {
-            throw;
+            return v_iRes;
         }
         return v_iRes;
     }

@@ -86,11 +86,10 @@
         try
         {
             v_iRes = v_objDVTController.FQ_110_DVT_sp_del_Delete_By_ID(v_objDVT.Ma_Don_Vi_Tinh);
-            v_arrDVT.Remove(v_objDVT);
         }
         catch (Exception)
         {
-            throw;
+            return v_iRes;
         }
         return v_iRes;
     }
@@ -118,6 +117,8 @@
                   "Your data has been deleted.",
                   SweetAlertIcon.Success
                   );
+                v_arrDVT.Remove(v_objDVT);
+
             }
             //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
             if (v_iRes == 0 || v_iRes == -1)

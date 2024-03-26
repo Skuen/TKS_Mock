@@ -78,17 +78,16 @@
     {
         NavigationManager.NavigateTo($"/EditKho/{Ma_Kho}");
     }
-    private int DeleteKho(CDM_Kho Kho)
+    private int DeleteKho(CDM_Kho v_objKho)
     {
         int v_iRes = 0;
         try
         {
-            v_iRes = v_objKhoController.FQ_114_K_sp_del_Delete_By_ID(Kho.Ma_Kho);
-            v_arrKho.Remove(Kho);
+            v_iRes = v_objKhoController.FQ_114_K_sp_del_Delete_By_ID(v_objKho.Ma_Kho);
         }
         catch (Exception)
         {
-            throw;
+            return v_iRes;
         }
         return v_iRes;
     }
@@ -115,6 +114,8 @@
                   "Your data has been deleted.",
                   SweetAlertIcon.Success
                   );
+                v_arrKho.Remove(v_objKho);
+
             }
             //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
             if (v_iRes == 0 || v_iRes == -1)

@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSweetAlert2();
+builder.Services.AddTelerikBlazor();
 // Connection
 CConfig.TKS_Mock_Conn_String = builder.Configuration.GetConnectionString("TKS_Mock_Conn_String");
 

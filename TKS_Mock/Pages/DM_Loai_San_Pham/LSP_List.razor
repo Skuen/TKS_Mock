@@ -86,18 +86,10 @@
     {
         NavigationManager.NavigateTo($"/EditLSP/{Ma_LSP}");
     }
-    private int DeleteLSP(CDM_Loai_San_Pham LSP)
+    private int DeleteLSP(CDM_Loai_San_Pham v_objLSP)
     {
         int v_iRes = 0;
-        try
-        {
-            v_iRes = v_objLSPController.FQ_122_LSP_sp_del_Delete_By_ID(LSP.Ma_LSP);
-            v_arrLSP.Remove(LSP);
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        v_iRes = v_objLSPController.FQ_122_LSP_sp_del_Delete_By_ID(v_objLSP.Ma_LSP);
         return v_iRes;
 
     }
@@ -125,6 +117,8 @@
                   "Your data has been deleted.",
                   SweetAlertIcon.Success
                   );
+                v_arrLSP.Remove(v_objLSP);
+
             }
             //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
             if (v_iRes == 0 || v_iRes == -1)
