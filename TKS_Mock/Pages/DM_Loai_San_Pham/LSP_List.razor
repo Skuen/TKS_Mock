@@ -9,6 +9,7 @@
 <button type="button"
         class="btn btn-primary"
         @onclick="AddLSP">
+    <span class="oi oi-plus"></span>
     Thêm Loại Sản Phẩm
 </button>
 <br />
@@ -22,6 +23,7 @@
     <button type="button"
             class="btn-success input-group-text"
             @onclick="OnSearch">
+        <span class="oi oi-magnifying-glass"></span>
         Tìm kiếm
     </button>
 </div>
@@ -44,9 +46,11 @@
                 <td>@item.Ghi_Chu</td>
                 <td>
                     <button type="button"
-                            class="btn btn-success" @onclick="@(()=>EditLSP(item.Ma_LSP))">Edit</button>
+                            class="btn btn-success" @onclick="@(()=>EditLSP(item.Ma_LSP))">
+                            <span class="oi oi-pencil"></span> Edit</button>
                     <button type="button"
-                                        class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
+                            class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">
+                            <span class="oi oi-trash"></span> Delete</button>
                 </td>
 
             </tr>

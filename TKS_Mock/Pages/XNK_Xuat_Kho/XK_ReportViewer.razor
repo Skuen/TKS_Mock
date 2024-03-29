@@ -1,0 +1,145 @@
+﻿@page "/XK_reportviewer/{Ma_XK}"
+@layout _EmptyLayout
+
+<PageTitle>Report Viewer</PageTitle>
+
+<ReportViewer ServiceUrl="/api/reports"
+              @bind-ReportSource="@ReportSource"
+              @bind-ScaleMode="@ScaleMode"
+              @bind-ViewMode="@ViewMode"
+              @bind-ParametersAreaVisible="@ParametersAreaVisible"
+              @bind-DocumentMapVisible="@DocumentMapVisible"
+              @bind-Scale="@Scale"
+              PageMode="@PageMode.ContinuousScroll"
+              PrintMode="@PrintMode.AutoSelect"
+              KeepClientAlive="true"
+              ServiceType="@ReportViewerServiceType.REST"
+              Height="900px"
+              Width="100%">
+    <ParameterDateTimeTemplate>
+        <TelerikDatePicker Value="@((DateTime)context.Value)"
+                           Format="dd/MM/yyyy"
+                           ValueChanged="@((DateTime value) => context.Value = value)">
+        </TelerikDatePicker>
+    </ParameterDateTimeTemplate>
+</ReportViewer>
+
+@code {
+    #region my code
+    [Parameter]
+    public string Ma_XK { get; set; }
+    //Dependencies
+    private CXNK_Xuat_Kho_Raw_Data_Controller v_objXKRDController = new();
+    private CXNK_Xuat_Kho_Controller v_objXKController = new();
+    private CXNK_Tao_Phieu_Controller v_objTPController = new();
+    private CDM_Kho_Controller v_objKhoController = new();
+    //variables
+    private List<CXNK_Xuat_Kho_Raw_Data> v_arrXKRD = new();
+    private CXNK_Xuat_Kho v_objXK = new();
+    #endregion
+    #region default from telerik generate
+    public ScaleMode ScaleMode { get; set; } = ScaleMode.Specific;
+    public ViewMode ViewMode { get; set; } = ViewMode.Interactive;
+    public bool ParametersAreaVisible { get; set; }
+    public bool DocumentMapVisible { get; set; }
+    public double Scale { get; set; } = 1.0;
+    public ReportSourceOptions ReportSource { get; set; } = new ReportSourceOptions("Template_Phieu_Xuat.trdp", new Dictionary<string, object>
+    {
+        // Add parameters if applicable
+    });
+    #endregion
+    protected override void OnInitialized()
+    {
+        v_objXK = v_objXKController.FQ_728_XK_sp_sel_Get_By_ID(Ma_XK);
+        v_arrXKRD = v_objXKRDController.FQ_734_XKRD_sp_sel_Get_By_ID(Ma_XK);
+        long v_lgSum = 0;
+        v_lgSum = GetTotalQuantityOfPhieuXuat();
+        ReportSource.Parameters.Add("Phieu_Xuat_ID",Ma_XK);
+        ReportSource.Parameters.Add("Tong", v_lgSum.ToString("#,##0"));
+        ReportSource.Parameters.Add("Tong_Bang_Chu", NumberToVietnameseWord(v_lgSum));
+        ReportSource.Parameters.Add("Ngay_Xuat_Kho", ConvertDatetimeToComplexString(v_objXK.Ngay_Xuat_Kho));
+        ReportSource.Parameters.Add("Ten_Kho", v_objKhoController.FQ_114_K_sp_sel_Get_By_ID(v_objXK.Kho_ID).Ten_Kho);
+        ReportSource.Parameters.Add("Ghi_Chu_Xuat_Kho", v_objXK.Ghi_Chu);
+    }
+    private long GetTotalQuantityOfPhieuXuat()
+    {
+        long v_iSum = 0;
+        foreach (var item in v_arrXKRD)
+        {
+            v_iSum += item.SL_Xuat;
+        }
+        return v_iSum;
+    }
+    private string NumberToVietnameseWord(long number)
+    {
+        string[] units = { "", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín" };
+        string[] places = { "", "nghìn", "triệu", "tỷ", "ngàn tỷ", "triệu tỷ", "tỷ tỷ" };
+
+        if (number == 0)
+            return "không";
+
+        string result = "";
+        int placeIndex = 0;
+
+        do
+        {
+            long n = number % 1000;
+            if (n != 0)
+            {
+                string words = ConvertThreeDigitNumberToWords(n, units);
+                result = words + " " + places[placeIndex] + " " + result;
+            }
+
+            placeIndex++;
+            number /= 1000;
+        }
+        while (number > 0);
+        //In hoa chữ cái đầu
+        result = char.ToUpper(result[0]) + result.Substring(1);
+        return result.Trim();
+    }
+
+    private string ConvertThreeDigitNumberToWords(long number, string[] units)
+    {
+        long hundreds = number / 100;
+        long tens = (number % 100) / 10;
+        long ones = number % 10;
+
+        string words = "";
+        if (hundreds > 0)
+        {
+            words += units[hundreds] + " trăm ";
+        }
+        if (tens > 1)
+        {
+            words += units[tens] + " mươi ";
+            if (ones > 0)
+                words += units[ones];
+        }
+        else if (tens == 1)
+        {
+            words += "mười ";
+            if (ones > 0)
+                words += units[ones];
+        }
+        else
+        {
+            if (ones > 0)
+                words += units[ones];
+        }
+
+        return words.Trim();
+    }
+    private string ConvertDatetimeToComplexString(DateTime? p_Ngay_Xuat_Kho)
+    {
+        string v_str = "";
+        if (p_Ngay_Xuat_Kho.HasValue)
+        {
+            DateTime currentDate = p_Ngay_Xuat_Kho.Value;
+            v_str += "Ngày " + currentDate.Day;
+            v_str += " Tháng " + currentDate.Month;
+            v_str += " Năm " + currentDate.Year;
+        }
+        return v_str;
+    }
+}

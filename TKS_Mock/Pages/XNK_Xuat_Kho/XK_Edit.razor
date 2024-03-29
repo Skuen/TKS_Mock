@@ -1,17 +1,17 @@
-﻿@page "/EditNK/{Ma_NK}"
+﻿@page "/EditXK/{Ma_XK}"
 @inject NavigationManager NavigationManager
-<h3>Chỉnh sửa Phiếu Nhập</h3>
+<h3>Chỉnh sửa Phiếu xuất</h3>
 <br />
-<EditForm Model="v_objNK" OnValidSubmit="UpdateNK">
+<EditForm Model="v_objXK" OnValidSubmit="UpdateXK">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
     <div class="form-group mb-2">
-        <label for="id">Số Phiếu Nhập Kho</label>
-        <InputText id="id" @bind-Value="v_objNK.So_Phieu_Nhap_Kho" class="form-control" readonly></InputText>
+        <label for="id">Số Phiếu Xuất Kho</label>
+        <InputText id="id" @bind-Value="v_objXK.So_Phieu_Xuat_Kho" class="form-control" readonly></InputText>
     </div>
     <div class="form-group mb-2">
         <label for="Kho">Kho</label>
-        <select id="Kho" @bind="v_objNK.Kho_ID" class="form-control">
+        <select id="Kho" @bind="v_objXK.Kho_ID" class="form-control">
             <option value="" disabled>Hãy chọn Kho</option>
             @foreach (var item in v_arrKho)
             {
@@ -21,7 +21,7 @@
     </div>
     <div class="form-group mb-2">
         <label for="NCC">Nhà cung cấp</label>
-        <select id="NCC" @bind="v_objNK.NCC_ID" class="form-control">
+        <select id="NCC" @bind="v_objXK.NCC_ID" class="form-control">
             <option value="" disabled>Hãy chọn Nhà cung cấp</option>
             @foreach (var item in v_arrNCC)
             {
@@ -31,12 +31,12 @@
 
     </div>
     <div class="form-group mb-2">
-        <label>Ngày nhập kho: </label>
-        <label>@(v_objNK.Ngay_Nhap_Kho.HasValue ? v_objNK.Ngay_Nhap_Kho.Value.ToString("HH:mm:ss  dd/MM/yyyy") : "")</label>
+        <label>Ngày xuất kho: </label>
+        <label>@(v_objXK.Ngay_Xuat_Kho.HasValue ? v_objXK.Ngay_Xuat_Kho.Value.ToString("HH:mm:ss  dd/MM/yyyy") : "")</label>
     </div>
     <div class="form-group mb-2">
         <label for="note">Ghi Chú</label>
-        <InputText id="note" @bind-Value="v_objNK.Ghi_Chu" class="form-control"></InputText>
+        <InputText id="note" @bind-Value="v_objXK.Ghi_Chu" class="form-control"></InputText>
     </div>
     <div class="form-group">
         <label for="SP">Sản Phẩm</label>
@@ -79,14 +79,14 @@
                 <th>Trị giá</th>
             </tr>
         </thead>
-        @foreach (var item in v_arrNKRD)
+        @foreach (var item in v_arrXKRD)
         {
             <tr>
                 <td>@item.San_Pham_ID</td>
                 <td>@v_objSPController.FQ_165_SP_sp_sel_Get_By_ID(item.San_Pham_ID).Ten_San_Pham</td>
-                <td><TelerikNumericTextBox Format="0" Min="1" @bind-Value="@item.SL_Nhap"></TelerikNumericTextBox></td>
-                <td><TelerikNumericTextBox Format="C" Min="0.01" @bind-Value="@item.Don_Gia_Nhap"></TelerikNumericTextBox></td>
-                <td><label>@string.Format("{0:C}", Math.Round((item.Don_Gia_Nhap * item.SL_Nhap), 2))</label></td>
+                <td><TelerikNumericTextBox Format="0" Min="1" @bind-Value="@item.SL_Xuat"></TelerikNumericTextBox></td>
+                <td><TelerikNumericTextBox Format="C" Min="0.01" @bind-Value="@item.Don_Gia_Xuat"></TelerikNumericTextBox></td>
+                <td><label>@string.Format("{0:C}", Math.Round((item.Don_Gia_Xuat * item.SL_Xuat), 2))</label></td>
                 <button type="button" class="btn btn-danger"
                         @onclick="@(()=>RemoveItemFromSelect(item.San_Pham_ID))">
                     Remove
@@ -105,16 +105,16 @@
 
 @code {
     [Parameter]
-    public string Ma_NK { get; set; }
+    public string Ma_XK { get; set; }
     //Depencies
-    private CXNK_Nhap_Kho_Controller v_objNKController = new();
-    private CXNK_Nhap_Kho_Raw_Data_Controller v_objNKRDController = new();
+    private CXNK_Xuat_Kho_Controller v_objXKController = new();
+    private CXNK_Xuat_Kho_Raw_Data_Controller v_objXKRDController = new();
     private CDM_Kho_Controller v_objKhoController = new();
     private CDM_NCC_Controller v_objNCCController = new();
     private CDM_San_Pham_Controller v_objSPController = new();
     //variables
-    private CXNK_Nhap_Kho v_objNK = new();
-    private List<CXNK_Nhap_Kho_Raw_Data> v_arrNKRD = new();
+    private CXNK_Xuat_Kho v_objXK = new();
+    private List<CXNK_Xuat_Kho_Raw_Data> v_arrXKRD = new();
     private List<CDM_Kho> v_arrKho = new();
     private List<CDM_NCC> v_arrNCC = new();
     private int v_ires = 0;
@@ -129,9 +129,9 @@
     //functions
     protected override void OnInitialized()
     {
-        v_objNK = v_objNKController.FQ_718_NK_sp_sel_Get_By_ID(Ma_NK);
-        v_arrNKRD = v_objNKRDController.FQ_719_NKRD_sp_sel_Get_By_ID(Ma_NK);
-        foreach (var item in v_arrNKRD)
+        v_objXK = v_objXKController.FQ_728_XK_sp_sel_Get_By_ID(Ma_XK);
+        v_arrXKRD = v_objXKRDController.FQ_734_XKRD_sp_sel_Get_By_ID(Ma_XK);
+        foreach (var item in v_arrXKRD)
         {
             v_arrSelectedValues.Add(item.San_Pham_ID);
         }
@@ -146,7 +146,7 @@
 
     private void BackToList()
     {
-        NavigationManager.NavigateTo("/NK");
+        NavigationManager.NavigateTo("/XK");
     }
     private void MapToRawData()
     {
@@ -154,17 +154,17 @@
         var itemsToDelete = v_arrPreviousSelected.Except(v_arrSelectedValues).ToList();
         foreach (var item_id in itemsToInsert)
         {
-            v_arrNKRD.Add(new CXNK_Nhap_Kho_Raw_Data
+            v_arrXKRD.Add(new CXNK_Xuat_Kho_Raw_Data
                 {
                     San_Pham_ID = item_id,
-                    SL_Nhap = 1,
-                    Don_Gia_Nhap = 1
+                    SL_Xuat = 1,
+                    Don_Gia_Xuat = 1
                 });
         }
 
         foreach (var item_id in itemsToDelete)
         {
-            v_arrNKRD.RemoveAll(item => item.San_Pham_ID == item_id);
+            v_arrXKRD.RemoveAll(item => item.San_Pham_ID == item_id);
         }
         v_arrPreviousSelected = v_arrSelectedValues;
     }
@@ -173,26 +173,26 @@
         v_arrSelectedValues.Remove(p_strSP_Id);
         v_arrPreviousSelected = v_arrSelectedValues;
         multiSelect.Rebind();
-        v_arrNKRD.RemoveAll(item => item.San_Pham_ID == p_strSP_Id);
+        v_arrXKRD.RemoveAll(item => item.San_Pham_ID == p_strSP_Id);
     }
     private double GetTotalSum()
     {
         double v_dSum = 0;
-        foreach (var item in v_arrNKRD)
+        foreach (var item in v_arrXKRD)
         {
-            v_dSum += item.Don_Gia_Nhap * item.SL_Nhap;
+            v_dSum += item.Don_Gia_Xuat * item.SL_Xuat;
         }
         return v_dSum;
     }
-    private void UpdateNK()
+    private void UpdateXK()
     {
-        if (this.v_objNK != null)
+        if (this.v_objXK != null)
         {
             try
             {
                 IsUpdated = true;
-                v_ires = v_objNKController.FQ_718_NK_sp_upd_Update(v_objNK);
-                UpdateNKRD();
+                v_ires = v_objXKController.FQ_728_XK_sp_upd_Update(v_objXK);
+                UpdateXKRD();
 
             }
             catch (Exception ex)
@@ -204,24 +204,24 @@
 
         }
     }
-    private void UpdateNKRD()
+    private void UpdateXKRD()
     {
-        var v_arrNKRD_Old = v_objNKRDController.FQ_719_NKRD_sp_sel_Get_By_ID(Ma_NK);
-        var itemsToUpdate = v_arrNKRD_Old.Intersect(v_arrNKRD).ToList();
-        var itemsToDelete = v_arrNKRD_Old.Except(v_arrNKRD).ToList();
-        var itemsToInsert = v_arrNKRD.Except(v_arrNKRD_Old).ToList();
+        var v_arrXKRD_Old = v_objXKRDController.FQ_734_XKRD_sp_sel_Get_By_ID(Ma_XK);
+        var itemsToUpdate = v_arrXKRD_Old.Intersect(v_arrXKRD).ToList();
+        var itemsToDelete = v_arrXKRD_Old.Except(v_arrXKRD).ToList();
+        var itemsToInsert = v_arrXKRD.Except(v_arrXKRD_Old).ToList();
         foreach (var item in itemsToUpdate)
         {
-            v_ires = v_objNKRDController.FQ_719_NKRD_sp_upd_Update(item);
+            v_ires = v_objXKRDController.FQ_734_XKRD_sp_upd_Update(item);
         }
         foreach (var item in itemsToDelete)
         {
-            v_ires = v_objNKRDController.FQ_719_NKRD_sp_del_Delete_By_ID(item);
+            v_ires = v_objXKRDController.FQ_734_XKRD_sp_del_Delete_By_ID(item);
         }
         foreach (var item in itemsToInsert)
         {
-            item.Nhap_Kho_ID = Ma_NK;
-            v_ires = v_objNKRDController.FQ_719_NKRD_sp_ins_Insert(item);
+            item.Xuat_Kho_ID = Ma_XK;
+            v_ires = v_objXKRDController.FQ_734_XKRD_sp_ins_Insert(item);
         }
     }
 
