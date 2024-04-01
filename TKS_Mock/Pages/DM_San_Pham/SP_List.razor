@@ -9,6 +9,7 @@
 <button type="button"
         class="btn btn-primary"
         @onclick="AddSP">
+    <span class="oi oi-plus"></span>
     Thêm Sản Phẩm
 </button>
 <br />
@@ -22,6 +23,7 @@
     <button type="button"
             class="btn-success input-group-text"
             @onclick="OnSearch">
+        <span class="oi oi-magnifying-glass"></span>
         Tìm kiếm
     </button>
 </div>
@@ -47,9 +49,11 @@
                 <td>@item.Ghi_Chu</td>
                 <td>
                     <button type="button"
-                                class="btn btn-success" @onclick="@(()=>EditSP(item.Ma_San_Pham))">Edit</button>
+                            class="btn btn-success" @onclick="@(()=>EditSP(item.Ma_San_Pham))">
+                            <span class="oi oi-pencil"></span> Edit</button>
                     <button type="button"
-                                        class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">Delete</button>
+                            class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">
+                            <span class="oi oi-trash"></span> Delete</button>
                 </td>
 
             </tr>

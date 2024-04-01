@@ -1,16 +1,16 @@
-﻿@page "/NK"
+﻿@page "/XK"
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject SweetAlertService Swal
-<h3>Danh sách Phiếu Nhập</h3>
+<h3>Danh sách Phiếu Xuất</h3>
 <br />
 <!--Nút thêm mới-->
 <button type="button"
         class="btn btn-primary"
-        @onclick="AddNK">
+        @onclick="AddXK">
     <span class="oi oi-plus"></span>
-    Thêm Phiếu Nhập
+    Thêm Phiếu Xuất
 </button>
 <br />
 <br />
@@ -18,7 +18,7 @@
 <div class="input-group">
     <input type="text"
            class="form-control"
-           placeholder="Điền tên phiếu nhập để tìm kiếm"
+           placeholder="Điền tên phiếu xuất để tìm kiếm"
            @bind-value="v_strSearchTerm" />
     <button type="button"
             class="btn-success input-group-text"
@@ -31,35 +31,35 @@
 <table class="table"
     <thead>
         <tr>
-            <th>Số Phiếu Nhập Kho</th>
+            <th>Số Phiếu Xuất Kho</th>
             <th>Kho</th>
             <th>Nhà cung cấp</th>
-            <th>Ngày nhập kho</th>
+            <th>Ngày xuất kho</th>
             <th>Ghi Chú</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in v_arrNK)
         {
-                <tr>
-                    <td>@item.So_Phieu_Nhap_Kho</td>
-                    <td>@v_objKhoController.FQ_114_K_sp_sel_Get_By_ID(item.Kho_ID).Ten_Kho</td>
-                    <td>@v_objNCCController.FQ_123_N_sp_sel_Get_By_ID(item.NCC_ID).Ten_NCC</td>
-                    <td>@(item.Ngay_Nhap_Kho.HasValue ? item.Ngay_Nhap_Kho.Value.ToString("HH:mm  dd/MM/yyyy") : "")</td>
-                    <td>@item.Ghi_Chu</td>
-                    <td>
-                        <button type="button" class="btn btn-secondary"
-                                 @onclick="@(()=>PopUpReport(item.So_Phieu_Nhap_Kho))">
-                                <span class="oi oi-print"></span> Print</button>
-                        <button type="button" class="btn btn-success" 
-                                @onclick="@(()=>EditNK(item.So_Phieu_Nhap_Kho))">
-                                <span class="oi oi-pencil"></span> Edit</button>
-                        <button type="button" class="btn btn-danger" 
-                                @onclick="@(()=>ShowConfirmation(item))">
-                                <span class="oi oi-trash"></span> Delete</button>
-                    </td>
+                    <tr>
+                        <td>@item.So_Phieu_Xuat_Kho</td>
+                        <td>@v_objKhoController.FQ_114_K_sp_sel_Get_By_ID(item.Kho_ID).Ten_Kho</td>
+                        <td>@v_objNCCController.FQ_123_N_sp_sel_Get_By_ID(item.NCC_ID).Ten_NCC</td>
+                        <td>@(item.Ngay_Xuat_Kho.HasValue ? item.Ngay_Xuat_Kho.Value.ToString("HH:mm  dd/MM/yyyy") : "")</td>
+                        <td>@item.Ghi_Chu</td>
+                        <td>
+                            <button type="button" class="btn btn-secondary"
+                                     @onclick="@(()=>PopUpReport(item.So_Phieu_Xuat_Kho))">
+                                     <span class="oi oi-print"></span> Print</button>
+                            <button type="button" class="btn btn-success"
+                                    @onclick="@(()=>EditXK(item.So_Phieu_Xuat_Kho))">
+                                    <span class="oi oi-pencil"></span> Edit</button>
+                            <button type="button" class="btn btn-danger"
+                                    @onclick="@(()=>ShowConfirmation(item))">
+                                    <span class="oi oi-trash"></span> Delete</button>
+                        </td>
 
-                </tr>
+                    </tr>
         }
     </tbody>
 </table>
@@ -67,37 +67,37 @@
 
 @code {
     //depencies
-    CXNK_Nhap_Kho_Controller v_objNKController = new();
+    CXNK_Xuat_Kho_Controller v_objXKController = new();
     CDM_Kho_Controller v_objKhoController = new();
     CDM_NCC_Controller v_objNCCController = new();
     //variables
-    public List<CXNK_Nhap_Kho> v_arrNK = new();
+    public List<CXNK_Xuat_Kho> v_arrNK = new();
     private string v_strSearchTerm = string.Empty;
     //functions
     protected override void OnInitialized()
     {
-        v_arrNK = v_objNKController.FQ_718_NK_sp_sel_List_For_Cache();
+        v_arrNK = v_objXKController.FQ_728_XK_sp_sel_List_For_Cache();
     }
 
     private void OnSearch()
     {
         if (string.IsNullOrEmpty(v_strSearchTerm))
         {
-            v_arrNK = v_objNKController.FQ_718_NK_sp_sel_List_For_Cache();
+            v_arrNK = v_objXKController.FQ_728_XK_sp_sel_List_For_Cache();
         }
     }
 
-    private void AddNK()
+    private void AddXK()
     {
-        NavigationManager.NavigateTo("/AddNK");
+        NavigationManager.NavigateTo("/AddXK");
     }
 
-    private void EditNK(string Ma_NK)
+    private void EditXK(string Ma_XK)
     {
-        NavigationManager.NavigateTo($"/EditNK/{Ma_NK}");
+        NavigationManager.NavigateTo($"/EditXK/{Ma_XK}");
     }
 
-    private async Task ShowConfirmation(CXNK_Nhap_Kho v_objNK)
+    private async Task ShowConfirmation(CXNK_Xuat_Kho v_objXK)
     {
 
         var result = await Swal.FireAsync(new SweetAlertOptions
@@ -113,7 +113,7 @@
         if (!string.IsNullOrEmpty(result.Value))
         {
             //v_iRes = số row bị ảnh hưởng dưới database
-            var v_iRes = DeleteNK(v_objNK);
+            var v_iRes = DeleteXK(v_objXK);
             //Có ít nhất 1 row bị ảnh hưởng
             if (v_iRes > 0)
             {
@@ -122,7 +122,7 @@
                   "Your data has been deleted.",
                   SweetAlertIcon.Success
                   );
-                v_arrNK.Remove(v_objNK);
+                v_arrNK.Remove(v_objXK);
             }
             //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
             if (v_iRes == 0 || v_iRes == -1)
@@ -136,16 +136,15 @@
         }
     }
 
-    private int DeleteNK(CXNK_Nhap_Kho v_objNK)
+    private int DeleteXK(CXNK_Xuat_Kho v_objXK)
     {
         int v_iRes = 0;
         try
         {
-            v_iRes = v_objNKController.FQ_718_NK_sp_del_Delete_By_ID(v_objNK.So_Phieu_Nhap_Kho);
+            v_iRes = v_objXKController.FQ_728_XK_sp_del_Delete_By_ID(v_objXK.So_Phieu_Xuat_Kho);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine(ex.Message.ToString());
             return v_iRes;
         }
         return v_iRes;
@@ -153,7 +152,7 @@
     private async Task PopUpReport(string p_strId)
     {
         //<ReportViewerPage></ReportViewerPage>
-        await JSRuntime.InvokeVoidAsync("open", $"/NK_reportviewer/{p_strId}", "_blank");
+        await JSRuntime.InvokeVoidAsync("open", $"/XK_reportviewer/{p_strId}", "_blank");
     }
 
 }

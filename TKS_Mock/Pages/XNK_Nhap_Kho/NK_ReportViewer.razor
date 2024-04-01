@@ -1,0 +1,151 @@
+﻿@page "/NK_reportviewer/{Ma_NK}"
+@layout _EmptyLayout
+<PageTitle>Report Viewer</PageTitle>
+
+<ReportViewer ServiceUrl="/api/reports"
+              @bind-ReportSource="@ReportSource"
+              @bind-ScaleMode="@ScaleMode"
+              @bind-ViewMode="@ViewMode"
+              @bind-ParametersAreaVisible="@ParametersAreaVisible"
+              @bind-DocumentMapVisible="@DocumentMapVisible"
+              @bind-Scale="@Scale"
+              PageMode="@PageMode.ContinuousScroll"
+              PrintMode="@PrintMode.AutoSelect"
+              KeepClientAlive="true"
+              ServiceType="@ReportViewerServiceType.REST"
+              Height="900px"
+              Width="100%">
+</ReportViewer> 
+
+@code {
+    #region my code
+    [Parameter]
+    public string Ma_NK { get; set; }
+    //Dependencies
+    private CXNK_Nhap_Kho_Raw_Data_Controller v_objNKRDController = new();
+    private CXNK_Nhap_Kho_Controller v_objNKController = new();
+    private CXNK_Tao_Phieu_Controller v_objTPController = new();
+    private CDM_Kho_Controller v_objKhoController = new();
+    //variables
+    private List<CXNK_Nhap_Kho_Raw_Data> v_arrNKRD = new();
+    private CXNK_Nhap_Kho v_objNK = new();
+    #endregion
+    #region default from telerik generate
+    public ScaleMode ScaleMode { get; set; } = ScaleMode.Specific;
+    public ViewMode ViewMode { get; set; } = ViewMode.Interactive;
+    public bool ParametersAreaVisible { get; set; }
+    public bool DocumentMapVisible { get; set; }
+    public double Scale { get; set; } = 1.0;
+
+    public ReportSourceOptions ReportSource { get; set; } = new ReportSourceOptions("Template_Phieu_Nhap.trdp", new Dictionary<string, object>
+    {
+    });
+    #endregion
+    protected override void OnInitialized()
+    {
+        v_objNK = v_objNKController.FQ_718_NK_sp_sel_Get_By_ID(Ma_NK);
+        v_arrNKRD = v_objNKRDController.FQ_719_NKRD_sp_sel_Get_By_ID(Ma_NK);
+        var sum = GetTotalSumOfPhieuNhap();
+        ReportSource.Parameters.Add("NhapKhoID",Ma_NK);
+        ReportSource.Parameters.Add("Tong_Tien", string.Format("{0:N0}", sum));
+        ReportSource.Parameters.Add("Tong_Tien_Bang_Chu", NumberToVietnameseWord(sum));
+        ReportSource.Parameters.Add("Ngay_Nhap_Kho", ConvertDatetimeToComplexString(v_objNK.Ngay_Nhap_Kho));
+        ReportSource.Parameters.Add("Ten_Kho", v_objKhoController.FQ_114_K_sp_sel_Get_By_ID(v_objNK.Kho_ID).Ten_Kho);
+        ReportSource.Parameters.Add("Tong", GetTotalQuantityOfPhieuNhap());
+
+    }
+    private int GetTotalSumOfPhieuNhap()
+    {
+        double v_dSum = 0;
+        foreach (var item in v_arrNKRD)
+        {
+            v_dSum += item.Don_Gia_Nhap * item.SL_Nhap;
+        }
+
+        return (int)Math.Ceiling(v_dSum);
+    }
+    private string NumberToVietnameseWord(int number)
+    {
+        string[] units = { "", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín" };
+        string[] places = { "", "nghìn", "triệu", "tỷ", "ngàn tỷ", "triệu tỷ", "tỷ tỷ" };
+
+        if (number == 0)
+            return "không";
+
+        string result = "";
+        int placeIndex = 0;
+
+        do
+        {
+            int n = number % 1000;
+            if (n != 0)
+            {
+                string words = ConvertThreeDigitNumberToWords(n, units);
+                result = words + " " + places[placeIndex] + " " + result;
+            }
+
+            placeIndex++;
+            number /= 1000;
+        }
+        while (number > 0);
+        //In hoa chữ cái đầu
+        result = char.ToUpper(result[0]) + result.Substring(1);
+        //Thêm loại tiền tệ vào cuối chuỗi
+        result += " USD";
+        return result.Trim();
+    }
+
+    private string ConvertThreeDigitNumberToWords(int number, string[] units)
+    {
+        int hundreds = number / 100;
+        int tens = (number % 100) / 10;
+        int ones = number % 10;
+
+        string words = "";
+        if (hundreds > 0)
+        {
+            words += units[hundreds] + " trăm ";
+        }
+        if (tens > 1)
+        {
+            words += units[tens] + " mươi ";
+            if (ones > 0)
+                words += units[ones];
+        }
+        else if (tens == 1)
+        {
+            words += "mười ";
+            if (ones > 0)
+                words += units[ones];
+        }
+        else
+        {
+            if (ones > 0)
+                words += units[ones];
+        }
+
+        return words.Trim();
+    }
+    private string ConvertDatetimeToComplexString(DateTime? p_Ngay_Nhap_Kho)
+    {
+        string v_str = "";
+        if (p_Ngay_Nhap_Kho.HasValue)
+        {
+            DateTime currentDate = p_Ngay_Nhap_Kho.Value;
+            v_str += "Ngày " + currentDate.Day;
+            v_str += " Tháng " + currentDate.Month;
+            v_str += " Năm " + currentDate.Year;
+        }
+        return  v_str;
+    }
+    private string GetTotalQuantityOfPhieuNhap()
+    {
+        long v_iSum = 0;
+        foreach (var item in v_arrNKRD)
+        {
+            v_iSum += item.SL_Nhap;
+        }
+        return v_iSum.ToString("#,##0");
+    }
+
+}

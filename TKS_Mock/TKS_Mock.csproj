@@ -9,6 +9,9 @@
   <ItemGroup>
     <PackageReference Include="CurrieTechnologies.Razor.SweetAlert2" Version="5.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.27" />
+    <PackageReference Include="Telerik.Reporting.OpenXmlRendering" Version="18.0.24.305" />
+    <PackageReference Include="Telerik.Reporting.Services.AspNetCore" Version="18.0.24.305" />
+    <PackageReference Include="Telerik.ReportViewer.BlazorNative" Version="18.0.24.305" />
     <PackageReference Include="Telerik.UI.for.Blazor" Version="5.1.1" />
   </ItemGroup>
 

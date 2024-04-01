@@ -47,9 +47,20 @@
         </TelerikMultiSelect>
     </div>
     <br />
-    <button type="submit" class="btn btn-primary" @onclick="InsertNK">Lưu</button>
+    <button type="submit" class="btn btn-primary" >Lưu</button>
     <button type="button" class="btn btn-primary" @onclick="BackToList">Quay Lại</button>
 </EditForm>
+@if (IsInserted)
+{
+    if (v_ires < 1)
+    {
+        <p class="alert alert-danger">Thêm thất bại</p>
+        if (!string.IsNullOrEmpty(v_strArlertMessage))
+        {
+            <p class="alert alert-danger">@v_strArlertMessage</p>
+        }
+    }
+}
 @if (v_arrSelectedValues.Count > 0)
 {
     <table class="table">
@@ -97,11 +108,13 @@
     private List<CDM_Kho> v_arrKho = new();
     private List<CDM_NCC> v_arrNCC = new();
     private int v_ires = 0;
+    private bool IsInserted = false;
+    private string v_strArlertMessage = string.Empty;
     //variables for multiple select
     private List<CDM_San_Pham> v_arrSP = new();
     private List<string> v_arrSelectedValues = new();
     private List<string> v_arrPreviousSelected = new();
-    Telerik.Blazor.Components.TelerikMultiSelect<CDM_San_Pham, string> multiSelect = new();
+    TelerikMultiSelect<CDM_San_Pham, string> multiSelect = new();
 
     //Function
     protected override void OnInitialized()
@@ -171,6 +184,7 @@
             catch (Exception ex)
             {
                 v_ires = 0;
+                v_strArlertMessage = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
 
