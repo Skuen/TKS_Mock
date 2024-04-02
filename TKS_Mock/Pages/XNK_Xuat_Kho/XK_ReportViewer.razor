@@ -16,12 +16,12 @@
               ServiceType="@ReportViewerServiceType.REST"
               Height="900px"
               Width="100%">
-    <ParameterDateTimeTemplate>
+@*     <ParameterDateTimeTemplate>
         <TelerikDatePicker Value="@((DateTime)context.Value)"
                            Format="dd/MM/yyyy"
                            ValueChanged="@((DateTime value) => context.Value = value)">
         </TelerikDatePicker>
-    </ParameterDateTimeTemplate>
+    </ParameterDateTimeTemplate> *@
 </ReportViewer>
 
 @code {

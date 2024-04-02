@@ -1,0 +1,77 @@
+﻿@inject NavigationManager NavigationManager
+@page "/XNK_Ton_List_By_Date"
+<h3>Danh sách Tồn Kho</h3>
+<br />
+<!-- Date picker-->
+<div style="float:left;" class="row g-3">
+    <div class="col-auto">
+        <label class="fw-bold">Từ ngày</label>
+        <TelerikDatePicker @bind-Value="dateFrom"
+                           Format="dd/MM/yyyy"
+                           OnClose="GetListByDate"
+                           Width="300px"
+                           Size="lg"
+                           Min="@Min" Max="@Max">
+        </TelerikDatePicker>
+    </div>
+    <div class="col-auto ms-4">
+        <label class="ms-4 fw-bold">Đến ngày</label>
+        <TelerikDatePicker @bind-Value="dateTo"
+                           Format="dd/MM/yyyy"
+                           OnClose="GetListByDate"
+                           Width="300px"
+                           Size="lg"
+                           Min="@Min" Max="@Max">
+        </TelerikDatePicker>
+    </div>
+
+</div>
+
+<br />
+<br />
+<table class="table"
+    <thead>
+        <tr>
+            <th>Mã Sản Phẩm</th>
+            <th>Tên Sản Phẩm</th>
+            <th>Số lượng đầu kỳ</th>
+            <th>Số lượng nhập</th>
+            <th>Số lượng xuất</th>
+            <th>Số lượng cuối kỳ</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in v_arrTK)
+        {
+            <tr>
+                <td>@item.Ma_San_Pham</td>
+                <td>@item.Ten_San_Pham</td>
+                <td>@item.SL_Dau_Ky</td>
+                <td>@item.SL_Nhap</td>
+                <td>@item.SL_Xuat</td>
+                <td>@item.SL_Cuoi_Ky</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
+@code {
+    //depencies
+    CXNK_Ton_Kho_Controller v_objTKController = new();
+    //variables
+    public List<CXNK_Ton_Kho_ViewModel> v_arrTK = new();
+    private string v_strSearchTerm = string.Empty;
+    //For date picker
+    DateTime? dateFrom { get; set; } = DateTime.Now;
+    DateTime? dateTo { get; set; } = DateTime.Now;
+    public DateTime Min = new DateTime(1990, 1, 1, 8, 15, 0);
+    public DateTime Max = new DateTime(2025, 1, 1, 19, 30, 45);
+    //functions
+    private void GetListByDate()
+    {
+        if (dateFrom.HasValue && dateTo.HasValue)
+        {
+            v_arrTK = v_objTKController.FQ_XNK_sp_sel_List_Ton_Kho_By_Date(dateFrom.Value, dateTo.Value);
+        }
+    }
+}

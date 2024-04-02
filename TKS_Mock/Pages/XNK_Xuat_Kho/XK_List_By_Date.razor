@@ -1,0 +1,92 @@
+﻿@page "/XK_List_By_Date"
+@inject NavigationManager NavigationManager
+<h3>Danh sách Phiếu Xuất</h3>
+<button type="button" class="btn btn-primary" @onclick="BackToList">Quay Lại</button>
+<br />
+<br />
+<!-- Date picker-->
+<div style="float:left;" class="row g-3">
+    <div class="col-auto">
+        <label class="fw-bold">Từ ngày</label>
+        <TelerikDatePicker @bind-Value="dateFrom"
+                           Format="dd/MM/yyyy"
+                           OnClose="GetListByDate"
+                           Width="300px"
+                           Size="lg"
+                           Min="@Min" Max="@Max">
+        </TelerikDatePicker>
+    </div>
+    <div class="col-auto ms-4">
+        <label class="ms-4 fw-bold">Đến ngày</label>
+        <TelerikDatePicker @bind-Value="dateTo"
+                           Format="dd/MM/yyyy"
+                           OnClose="GetListByDate"
+                           Width="300px"
+                           Size="lg"
+                           Min="@Min" Max="@Max">
+        </TelerikDatePicker>
+    </div>
+
+</div>
+<!-- Danh sách-->
+<table class="table"
+    <thead>
+        <tr>
+            <th>Ngày nhập kho</th>
+            <th>Số Phiếu Nhập Kho</th>
+            <th>Nhà cung cấp</th>
+            <th>Mã Sản Phẩm</th>
+            <th>Tên Sản Phẩm</th>
+            <th>Số lượng nhập</th>
+            <th>Đơn giá</th>
+            <th>Trị giá</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var v_objXK in v_arrXK)
+        {
+            foreach (var item in v_objXKRDController.FQ_734_XKRD_sp_sel_Get_By_ID(v_objXK.So_Phieu_Xuat_Kho))
+            {
+                <tr>
+                    <td>@(v_objXK.Ngay_Xuat_Kho.HasValue 
+                        ? v_objXK.Ngay_Xuat_Kho.Value.ToString("HH:mm  dd/MM/yyyy") : "")</td>
+                    <td>@v_objXK.So_Phieu_Xuat_Kho</td>
+                    <td>@v_objNCCController.FQ_123_N_sp_sel_Get_By_ID(v_objXK.NCC_ID).Ten_NCC</td>
+                    <td>@item.San_Pham_ID</td>
+                    <td>@v_objSPController.FQ_165_SP_sp_sel_Get_By_ID(item.San_Pham_ID).Ten_San_Pham</td>
+                    <td>@item.SL_Xuat</td>
+                    <td><label>@string.Format("{0:C}", item.Don_Gia_Xuat)</label></td>
+                    <td><label>@string.Format("{0:C}", Math.Round((item.Don_Gia_Xuat * item.SL_Xuat), 2))</label></td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<br />
+@code {
+    //depencies
+    private CXNK_Xuat_Kho_Controller v_objXKController = new();
+    private CXNK_Xuat_Kho_Raw_Data_Controller v_objXKRDController = new();
+    private CDM_San_Pham_Controller v_objSPController = new();
+    private CDM_NCC_Controller v_objNCCController = new();
+    //variables
+    private List<CXNK_Xuat_Kho> v_arrXK = new();
+    private string v_strSearchTerm = string.Empty;
+    //For date picker
+    DateTime? dateFrom { get; set; } = DateTime.Now;
+    DateTime? dateTo { get; set; } = DateTime.Now;
+    public DateTime Min = new DateTime(1990, 1, 1, 8, 15, 0);
+    public DateTime Max = new DateTime(2025, 1, 1, 19, 30, 45);
+    //functions
+    private void GetListByDate()
+    {
+        if (dateFrom.HasValue && dateTo.HasValue)
+        {
+            v_arrXK = v_objXKController.FQ_728_XK_sp_sel_List_By_Date_Created(dateFrom.Value, dateTo.Value);
+        }
+    }
+    private void BackToList()
+    {
+        NavigationManager.NavigateTo("/XK");
+    }
+}

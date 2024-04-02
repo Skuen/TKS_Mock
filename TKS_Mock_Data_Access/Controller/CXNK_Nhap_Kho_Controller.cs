@@ -40,6 +40,38 @@ namespace TKS_Mock_Data_Access.Controller
 
             return v_arrRes;
         }
+        public List<CXNK_Nhap_Kho> FQ_718_NK_sp_sel_List_By_Date_Created(DateTime p_dtmFrom, DateTime p_dtmTo)
+        {
+            List<CXNK_Nhap_Kho> v_arrRes = new List<CXNK_Nhap_Kho>();
+            DataTable v_dt = new DataTable();
+
+            try
+            {
+                p_dtmFrom = p_dtmFrom.Date;
+                p_dtmTo = p_dtmTo.Date.AddDays(1).AddTicks(-1);
+
+                CSqlHelper.FillDataTable(CConfig.TKS_Mock_Conn_String, v_dt, "FQ_718_NK_sp_sel_List_By_Date_Created", p_dtmFrom, p_dtmTo);
+
+                foreach (DataRow v_row in v_dt.Rows)
+                {
+                    CXNK_Nhap_Kho v_objRes = CUtility.Map_Row_To_Entity<CXNK_Nhap_Kho>(v_row);
+                    v_arrRes.Add(v_objRes);
+                }
+            }
+
+            catch (Exception)
+            {
+                throw;
+            }
+
+            finally
+            {
+                v_dt.Dispose();
+            }
+
+            return v_arrRes;
+        }
+
         public CXNK_Nhap_Kho FQ_718_NK_sp_sel_Get_By_ID(string p_iID)
         {
             CXNK_Nhap_Kho v_objRes = null;
