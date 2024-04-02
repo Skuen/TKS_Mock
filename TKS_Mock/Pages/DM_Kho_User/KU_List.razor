@@ -1,0 +1,135 @@
+﻿@page "/KU"
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject SweetAlertService Swal
+<h3>Danh sách Kho User</h3>
+<br />
+<!--Nút thêm mới-->
+<button type="button"
+        class="btn btn-primary"
+        @onclick="AddKU">
+    <span class="oi oi-plus"></span>
+    Thêm Kho User
+</button>
+<br />
+<br />
+<!-- Thanh tìm kiếm -->
+<div class="input-group">
+    <input type="text"
+           class="form-control"
+           placeholder="Điền tên kho để tìm kiếm"
+           @bind-value="v_strSearchTerm" />
+    <button type="button"
+            class="btn-success input-group-text"
+            @onclick="OnSearch">
+        <span class="oi oi-magnifying-glass"></span>
+        Tìm kiếm
+    </button>
+</div>
+<br />
+<!-- Danh sách-->
+<table class="table"
+    <thead>
+        <tr>
+            <th>Mã Đăng Nhập</th>
+            <th>Mã Kho</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in v_arrKhoUser)
+        {
+                <tr>
+                    <td>@item.Ma_Dang_Nhap</td>
+                    <td>@item.Kho_ID</td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-success" @onclick="@(()=>EditKho(item.Ma_Dang_Nhap))">
+                                <span class="oi oi-pencil"></span> Edit</button>
+                        <button type="button"
+                                class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">
+                                <span class="oi oi-trash"></span> Delete</button>
+                    </td>
+
+                </tr>
+        }
+    </tbody>
+</table>
+<br />
+
+@code {
+    private string v_strSearchTerm = string.Empty;
+    public List<CDM_Kho_User> v_arrKhoUser = new();
+    CDM_Kho_User_Controller v_objKhoUserController = new();
+
+    private void OnSearch()
+    {
+        if (string.IsNullOrEmpty(v_strSearchTerm))
+        {
+            v_arrKhoUser = v_objKhoUserController.FQ_117_KU_sp_sel_List_For_Cache();
+        }
+    }
+    protected override void OnInitialized()
+    {
+        v_arrKhoUser = v_objKhoUserController.FQ_117_KU_sp_sel_List_For_Cache();
+    }
+    private void AddKU()
+    {
+        NavigationManager.NavigateTo("/AddKU");
+    }
+    private void EditKho(string p_strMa_Dang_Nhap)
+    {
+        NavigationManager.NavigateTo($"/EditKU/{p_strMa_Dang_Nhap}");
+    }
+    private int DeleteKho(CDM_Kho_User v_objKhoUser)
+    {
+        int v_iRes = 0;
+        try
+        {
+            v_iRes = v_objKhoUserController.FQ_117_KU_sp_del_Delete_By_ID(v_objKhoUser.Ma_Dang_Nhap);
+        }
+        catch (Exception)
+        {
+            return v_iRes;
+        }
+        return v_iRes;
+    }
+    private async Task ShowConfirmation(CDM_Kho_User v_objKhoUser)
+    {
+        var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Are you sure?",
+                Text = "You will not be able to recover this!",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Yes, delete it!",
+                ConfirmButtonColor = "red",
+                CancelButtonText = "No, keep it"
+            });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            var v_iRes = DeleteKho(v_objKhoUser);
+            //Có ít nhất 1 row bị ảnh hưởng
+            if (v_iRes > 0)
+            {
+                await Swal.FireAsync(
+                  "Deleted",
+                  "Your data has been deleted.",
+                  SweetAlertIcon.Success
+                  );
+                v_arrKhoUser.Remove(v_objKhoUser);
+
+            }
+            //Nếu v_iRes trả default hoặc không có row nào bị ảnh hưởng
+            if (v_iRes == 0 || v_iRes == -1)
+            {
+                await Swal.FireAsync(
+                  "Cancelled",
+                  "Something wrong happened",
+                  SweetAlertIcon.Error
+                  );
+            }
+        }
+    }
+
+}
