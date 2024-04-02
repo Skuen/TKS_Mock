@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -60,6 +61,24 @@ namespace TKS_Mock_Data_Access.Controller
 
             return v_iRes;
         }
+        public int FQ_719_NKRD_sp_ins_Insert(SqlConnection p_conn, SqlTransaction p_trans, CXNK_Nhap_Kho_Raw_Data p_objData)
+        {
+            int v_iRes = CConst.INT_VALUE_NULL;
+
+            try
+            {
+                v_iRes = CSqlHelper.ExecuteNonquery(p_conn, p_trans, CConfig.TKS_Mock_Conn_String, "FQ_719_NKRD_sp_ins_Insert",
+                    p_objData.Nhap_Kho_ID, p_objData.San_Pham_ID, p_objData.SL_Nhap, p_objData.Don_Gia_Nhap);
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+
+            return v_iRes;
+        }
         public int FQ_719_NKRD_sp_upd_Update(CXNK_Nhap_Kho_Raw_Data p_objData)
         {
             int v_iRes = CConst.INT_VALUE_NULL;
@@ -77,12 +96,46 @@ namespace TKS_Mock_Data_Access.Controller
 
             return v_iRes;
         }
+        public int FQ_719_NKRD_sp_upd_Update(SqlConnection p_conn, SqlTransaction p_trans, CXNK_Nhap_Kho_Raw_Data p_objData)
+        {
+            int v_iRes = CConst.INT_VALUE_NULL;
+            try
+            {
+                v_iRes = CSqlHelper.ExecuteNonquery(p_conn, p_trans, CConfig.TKS_Mock_Conn_String, "FQ_719_NKRD_sp_upd_Update",
+                    p_objData.Nhap_Kho_ID, p_objData.San_Pham_ID, p_objData.SL_Nhap, p_objData.Don_Gia_Nhap);
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+
+            return v_iRes;
+        }
         public int FQ_719_NKRD_sp_del_Delete_By_ID(CXNK_Nhap_Kho_Raw_Data p_objData)
         {
             int v_iRes = CConst.INT_VALUE_NULL;
             try
             {
                 v_iRes = CSqlHelper.ExecuteNonquery(CConfig.TKS_Mock_Conn_String, "FQ_719_NKRD_sp_del_Delete_By_ID", 
+                    p_objData.Nhap_Kho_ID, p_objData.San_Pham_ID);
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+
+            return v_iRes;
+        }
+        public int FQ_719_NKRD_sp_del_Delete_By_ID(SqlConnection p_conn, SqlTransaction p_trans, CXNK_Nhap_Kho_Raw_Data p_objData)
+        {
+            int v_iRes = CConst.INT_VALUE_NULL;
+            try
+            {
+                v_iRes = CSqlHelper.ExecuteNonquery(p_conn, p_trans, CConfig.TKS_Mock_Conn_String, "FQ_719_NKRD_sp_del_Delete_By_ID",
                     p_objData.Nhap_Kho_ID, p_objData.San_Pham_ID);
             }
 

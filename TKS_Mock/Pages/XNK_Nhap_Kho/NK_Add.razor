@@ -165,46 +165,53 @@
     }
     private async Task InsertNK()
     {
-        if (this.v_objNK != null)
+        if (this.v_objNK == null) return;
+        //For transaction
+        SqlConnection v_conn = null;
+        SqlTransaction v_trans = null;
+        
+        try
         {
-            try
-            {
-                v_ires = v_objNKController.FQ_718_NK_sp_ins_Insert(v_objNK);
-                InsertNKRD();
-                if(v_ires > 0)
-                {
-                    await Swal.FireAsync(
-                      "Insert all completed",
-                      "Your data has been added.",
-                      SweetAlertIcon.Success
-                      );
-                    NavigationManager.NavigateTo("/NK");
-                }
-            }
-            catch (Exception ex)
-            {
-                v_ires = 0;
-                v_strArlertMessage = ex.Message;
-                Console.WriteLine(ex.ToString());
-            }
-
-        }
-    }
-    private void InsertNKRD()
-    {
-        foreach(var item in v_arrNKRD)
-        {
-            try
+            v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Mock_Conn_String);
+            v_conn.Open();
+            v_trans = v_conn.BeginTransaction();
+            //Insert header
+            v_ires = v_objNKController.FQ_718_NK_sp_ins_Insert(v_conn, v_trans, v_objNK);
+            //Inser details
+            foreach (var item in v_arrNKRD)
             {
                 item.Nhap_Kho_ID = v_objNK.So_Phieu_Nhap_Kho;
-                v_ires = v_objNKRDController.FQ_719_NKRD_sp_ins_Insert(item);
+                v_ires = v_objNKRDController.FQ_719_NKRD_sp_ins_Insert(v_conn, v_trans, item);
             }
-            catch(Exception)
+            //Check if insert success or not
+            if(v_ires > 0)
             {
-                v_ires = 0;
-                break;
+                v_trans.Commit();
+                await Swal.FireAsync(
+                    "Insert all completed",
+                    "Your data has been added.",
+                    SweetAlertIcon.Success
+                    );
+                NavigationManager.NavigateTo("/NK");
             }
         }
+        catch (Exception ex)
+        {
+            v_ires = 0;
+            v_strArlertMessage = ex.Message;
+            Console.WriteLine(ex.ToString());
+            if (v_trans != null)
+                v_trans.Rollback();
+        }
+        finally
+        {
+            if (v_trans != null)
+                v_trans.Dispose();
+
+            if (v_conn != null)
+                v_conn.Close();
+        }
+
     }
 
 }

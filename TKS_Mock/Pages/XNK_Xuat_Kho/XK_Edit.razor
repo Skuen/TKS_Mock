@@ -186,43 +186,56 @@
     }
     private void UpdateXK()
     {
-        if (this.v_objXK != null)
+        if (this.v_objXK == null) return;
+        //For transaction
+        SqlConnection v_conn = null;
+        SqlTransaction v_trans = null;
+        
+        try
         {
-            try
+            v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Mock_Conn_String);
+            v_conn.Open();
+            v_trans = v_conn.BeginTransaction();
+            IsUpdated = true;
+            //Insert header
+            v_ires = v_objXKController.FQ_728_XK_sp_upd_Update(v_conn, v_trans, v_objXK);
+            //Inser details
+            var v_arrXKRD_Old = v_objXKRDController.FQ_734_XKRD_sp_sel_Get_By_ID(Ma_XK);
+
+            var itemsToUpdate = v_arrXKRD_Old.Intersect(v_arrXKRD).ToList();
+            var itemsToDelete = v_arrXKRD_Old.Except(v_arrXKRD).ToList();
+            var itemsToInsert = v_arrXKRD.Except(v_arrXKRD_Old).ToList();
+            foreach (var item in itemsToUpdate)
             {
-                IsUpdated = true;
-                v_ires = v_objXKController.FQ_728_XK_sp_upd_Update(v_objXK);
-                UpdateXKRD();
-
+                v_ires = v_objXKRDController.FQ_734_XKRD_sp_upd_Update(v_conn, v_trans, item);
             }
-            catch (Exception ex)
+            foreach (var item in itemsToDelete)
             {
-                v_ires = 0;
-                v_strArlertMessage = ex.Message;
-                Console.WriteLine(ex.ToString());
+                v_ires = v_objXKRDController.FQ_734_XKRD_sp_del_Delete_By_ID(v_conn, v_trans, item);
             }
+            foreach (var item in itemsToInsert)
+            {
+                item.Xuat_Kho_ID = Ma_XK;
+                v_ires = v_objXKRDController.FQ_734_XKRD_sp_ins_Insert(v_conn, v_trans, item);
+            }
+            v_trans.Commit();
+        }
+        catch (Exception ex)
+        {
+            v_ires = 0;
+            v_strArlertMessage = ex.Message;
+            Console.WriteLine(ex.ToString());
+            if (v_trans != null)
+                v_trans.Rollback();
+        }
+        finally
+        {
+            if (v_trans != null)
+                v_trans.Dispose();
 
+            if (v_conn != null)
+                v_conn.Close();
         }
-    }
-    private void UpdateXKRD()
-    {
-        var v_arrXKRD_Old = v_objXKRDController.FQ_734_XKRD_sp_sel_Get_By_ID(Ma_XK);
-        var itemsToUpdate = v_arrXKRD_Old.Intersect(v_arrXKRD).ToList();
-        var itemsToDelete = v_arrXKRD_Old.Except(v_arrXKRD).ToList();
-        var itemsToInsert = v_arrXKRD.Except(v_arrXKRD_Old).ToList();
-        foreach (var item in itemsToUpdate)
-        {
-            v_ires = v_objXKRDController.FQ_734_XKRD_sp_upd_Update(item);
-        }
-        foreach (var item in itemsToDelete)
-        {
-            v_ires = v_objXKRDController.FQ_734_XKRD_sp_del_Delete_By_ID(item);
-        }
-        foreach (var item in itemsToInsert)
-        {
-            item.Xuat_Kho_ID = Ma_XK;
-            v_ires = v_objXKRDController.FQ_734_XKRD_sp_ins_Insert(item);
-        }
-    }
 
+    }
 }

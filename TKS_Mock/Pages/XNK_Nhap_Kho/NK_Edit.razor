@@ -142,8 +142,6 @@
         v_arrNCC = v_objNCCController.FQ_123_N_sp_sel_List_For_Cache();
         v_arrSP = v_objSPController.FQ_165_SP_sp_sel_List_For_Cache();
     }
-
-
     private void BackToList()
     {
         NavigationManager.NavigateTo("/NK");
@@ -188,40 +186,56 @@
     {
         if (this.v_objNK != null)
         {
+            //For transaction
+            SqlConnection v_conn = null;
+            SqlTransaction v_trans = null;
+           
             try
             {
+                v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Mock_Conn_String);
+                v_conn.Open();
+                v_trans = v_conn.BeginTransaction();
                 IsUpdated = true;
-                v_ires = v_objNKController.FQ_718_NK_sp_upd_Update(v_objNK);
-                UpdateNKRD();
-
+                //Insert header
+                v_ires = v_objNKController.FQ_718_NK_sp_upd_Update(v_conn, v_trans, v_objNK);
+                //Insert details
+                var v_arrNKRD_Old = v_objNKRDController.FQ_719_NKRD_sp_sel_Get_By_ID(Ma_NK);
+                
+                var itemsToUpdate = v_arrNKRD_Old.Intersect(v_arrNKRD).ToList();
+                var itemsToDelete = v_arrNKRD_Old.Except(v_arrNKRD).ToList();
+                var itemsToInsert = v_arrNKRD.Except(v_arrNKRD_Old).ToList();
+                foreach (var item in itemsToUpdate)
+                {
+                    v_ires = v_objNKRDController.FQ_719_NKRD_sp_upd_Update(v_conn, v_trans, item);
+                }
+                foreach (var item in itemsToDelete)
+                {
+                    v_ires = v_objNKRDController.FQ_719_NKRD_sp_del_Delete_By_ID(v_conn, v_trans, item);
+                }
+                foreach (var item in itemsToInsert)
+                {
+                    item.Nhap_Kho_ID = Ma_NK;
+                    v_ires = v_objNKRDController.FQ_719_NKRD_sp_ins_Insert(v_conn, v_trans, item);
+                }
+                v_trans.Commit();
             }
             catch (Exception ex)
             {
                 v_ires = 0;
                 v_strArlertMessage = ex.Message;
                 Console.WriteLine(ex.ToString());
+                if (v_trans != null)
+                    v_trans.Rollback();
+            }
+            finally
+            {
+                if (v_trans != null)
+                    v_trans.Dispose();
+
+                if (v_conn != null)
+                    v_conn.Close();
             }
 
-        }
-    }
-    private void UpdateNKRD()
-    {
-        var v_arrNKRD_Old = v_objNKRDController.FQ_719_NKRD_sp_sel_Get_By_ID(Ma_NK);
-        var itemsToUpdate = v_arrNKRD_Old.Intersect(v_arrNKRD).ToList();
-        var itemsToDelete = v_arrNKRD_Old.Except(v_arrNKRD).ToList();
-        var itemsToInsert = v_arrNKRD.Except(v_arrNKRD_Old).ToList();
-        foreach (var item in itemsToUpdate)
-        {
-            v_ires = v_objNKRDController.FQ_719_NKRD_sp_upd_Update(item);
-        }
-        foreach (var item in itemsToDelete)
-        {
-            v_ires = v_objNKRDController.FQ_719_NKRD_sp_del_Delete_By_ID(item);
-        }
-        foreach (var item in itemsToInsert)
-        {
-            item.Nhap_Kho_ID = Ma_NK;
-            v_ires = v_objNKRDController.FQ_719_NKRD_sp_ins_Insert(item);
         }
     }
 

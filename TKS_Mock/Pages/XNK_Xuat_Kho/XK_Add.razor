@@ -167,46 +167,51 @@
     }
     private async Task InsertXK()
     {
-        if (this.v_objXK != null)
+        if (this.v_objXK == null) return;
+        //For transaction
+        SqlConnection v_conn = null;
+        SqlTransaction v_trans = null;
+        v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Mock_Conn_String);
+        v_conn.Open();
+        v_trans = v_conn.BeginTransaction();
+        try
         {
-            try
-            {
-                v_ires = v_objXKController.FQ_728_XK_sp_ins_Insert(v_objXK);
-                InsertXKRD();
-                if (v_ires > 0)
-                {
-                    await Swal.FireAsync(
-                      "Insert all completed",
-                      "Your data has been added.",
-                      SweetAlertIcon.Success
-                      );
-                    NavigationManager.NavigateTo("/XK");
-                }
-            }
-            catch (Exception ex)
-            {
-                v_strArlertMessage = ex.Message;
-                v_ires = 0;
-                Console.WriteLine(ex.ToString());
-            }
-
-        }
-    }
-    private void InsertXKRD()
-    {
-        foreach (var item in v_arrXKRD)
-        {
-            try
+            //Insert header
+            v_ires = v_objXKController.FQ_728_XK_sp_ins_Insert(v_conn, v_trans, v_objXK);
+            //Inser details
+            foreach (var item in v_arrXKRD)
             {
                 item.Xuat_Kho_ID = v_objXK.So_Phieu_Xuat_Kho;
-                v_ires = v_objXKRDController.FQ_734_XKRD_sp_ins_Insert(item);
+                v_ires = v_objXKRDController.FQ_734_XKRD_sp_ins_Insert(v_conn, v_trans, item);
             }
-            catch (Exception)
+            v_trans.Commit();
+            if (v_ires > 0)
             {
-                v_ires = 0;
-                break;
+                await Swal.FireAsync(
+                    "Insert all completed",
+                    "Your data has been added.",
+                    SweetAlertIcon.Success
+                    );
+                NavigationManager.NavigateTo("/XK");
             }
         }
+        catch (Exception ex)
+        {
+            v_strArlertMessage = ex.Message;
+            v_ires = 0;
+            Console.WriteLine(ex.ToString());
+            if (v_trans != null)
+                v_trans.Rollback();
+        }
+        finally
+        {
+            if (v_trans != null)
+                v_trans.Dispose();
+
+            if (v_conn != null)
+                v_conn.Close();
+        }
+
     }
 
 }

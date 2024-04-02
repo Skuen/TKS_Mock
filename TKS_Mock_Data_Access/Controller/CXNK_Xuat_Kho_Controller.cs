@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -116,12 +117,46 @@ namespace TKS_Mock_Data_Access.Controller
 
             return v_iRes;
         }
+        public int FQ_728_XK_sp_ins_Insert(SqlConnection p_conn, SqlTransaction p_trans, CXNK_Xuat_Kho p_objData)
+        {
+            int v_iRes = CConst.INT_VALUE_NULL;
+
+            try
+            {
+                v_iRes = CSqlHelper.ExecuteNonquery(p_conn, p_trans, CConfig.TKS_Mock_Conn_String, "FQ_728_XK_sp_ins_Insert",
+                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ghi_Chu);
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+
+            return v_iRes;
+        }
         public int FQ_728_XK_sp_upd_Update(CXNK_Xuat_Kho p_objData)
         {
             int v_iRes = CConst.INT_VALUE_NULL;
             try
             {
                 v_iRes = CSqlHelper.ExecuteNonquery(CConfig.TKS_Mock_Conn_String, "FQ_728_XK_sp_upd_Update", 
+                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ghi_Chu);
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+            return v_iRes;
+        }
+        public int FQ_728_XK_sp_upd_Update(SqlConnection p_conn, SqlTransaction p_trans, CXNK_Xuat_Kho p_objData)
+        {
+            int v_iRes = CConst.INT_VALUE_NULL;
+            try
+            {
+                v_iRes = CSqlHelper.ExecuteNonquery(p_conn, p_trans, CConfig.TKS_Mock_Conn_String, "FQ_728_XK_sp_upd_Update",
                     p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ghi_Chu);
             }
 
