@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace TKS_Mock_Data_Access.Entity
             m_strMa_Dang_Nhap = CConst.STR_VALUE_NULL;
             m_strKho_ID = CConst.STR_VALUE_NULL;
         }
-
+        [Required(ErrorMessage = "Mã đăng nhập là bắt buộc")]
         public string Ma_Dang_Nhap
         {
             get
@@ -34,7 +35,7 @@ namespace TKS_Mock_Data_Access.Entity
                 m_strMa_Dang_Nhap = value.Trim();
             }
         }
-
+        [Required(ErrorMessage = "Kho là bắt buộc")]
         public string Kho_ID
         {
             get

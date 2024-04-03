@@ -54,6 +54,10 @@
     else
     {
         <p class="alert alert-danger">Thêm mới thất bại</p>
+        if (!string.IsNullOrEmpty(v_strArlertMessage))
+        {
+            <p class="alert alert-danger">@v_strArlertMessage</p>
+        }
     }
 }
 @code {
@@ -67,6 +71,7 @@
     private List<CDM_Loai_San_Pham> v_arrLSP = new();
     private bool IsInserted = false;
     private int v_ires = 0;
+    private string v_strArlertMessage = string.Empty;
     //Function
     protected override void OnInitialized()
     {
@@ -85,6 +90,7 @@
             catch (Exception ex)
             {
                 v_ires = 0;
+                v_strArlertMessage = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
 

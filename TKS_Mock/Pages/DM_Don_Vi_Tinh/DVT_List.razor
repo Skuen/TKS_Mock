@@ -47,10 +47,10 @@
                 <td>
                     <button type="button"
                             class="btn btn-success" @onclick="@(()=>EditDVT(item.Ma_Don_Vi_Tinh))">
-                            <span class="oi oi-pencil"></span> Edit</button>
+                            <span class="oi oi-pencil"></span> Sửa</button>
                     <button type="button"
                             class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">
-                            <span class="oi oi-trash"></span> Delete</button>
+                            <span class="oi oi-trash"></span> Xóa</button>
                 </td>
 
             </tr>
@@ -102,13 +102,13 @@
 
         var result = await Swal.FireAsync(new SweetAlertOptions
             {
-                Title = "Are you sure?",
-                Text = "You will not be able to recover this!",
+                Title = "Bạn chắc chứ?",
+                Text = "Dữ liệu này sẽ mất sau khi xóa!",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
-                ConfirmButtonText = "Yes, delete it!",
+                ConfirmButtonText = "Xóa!",
                 ConfirmButtonColor = "red",
-                CancelButtonText = "No, keep it"
+                CancelButtonText = "Hủy bỏ"
             });
         if (!string.IsNullOrEmpty(result.Value))
         {
@@ -117,8 +117,8 @@
             if (v_iRes > 0)
             {
                 await Swal.FireAsync(
-                  "Deleted",
-                  "Your data has been deleted.",
+                  "Đã xóa",
+                  "Dữ liệu của bạn đã được xóa thành công.",
                   SweetAlertIcon.Success
                   );
                 v_arrDVT.Remove(v_objDVT);
@@ -128,10 +128,10 @@
             if (v_iRes == 0 || v_iRes == -1)
             {
                 await Swal.FireAsync(
-                  "Cancelled",
-                  "Something wrong happened",
-                  SweetAlertIcon.Error
-                  );
+                 "Hủy bỏ",
+                 "Xóa không thành công!",
+                 SweetAlertIcon.Error
+                 );
             }
         }
     }

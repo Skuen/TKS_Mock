@@ -8,11 +8,11 @@
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 
-    <div class="form-group">
+    <div class="form-control">
         <label for="id">Số Phiếu xuất Kho</label>
         <InputText id="id" @bind-Value="v_objXK.So_Phieu_Xuat_Kho" class="form-control"></InputText>
     </div>
-    <div class="form-group">
+    <div class="form-control">
         <label for="Kho">Kho</label>
         <select id="Kho" @bind="v_objXK.Kho_ID" class="form-control">
             <option value="" selected disabled>Hãy chọn Kho</option>
@@ -22,7 +22,7 @@
             }
         </select>
     </div>
-    <div class="form-group">
+    <div class="form-control">
         <label for="NCC">Nhà cung cấp</label>
         <select id="NCC" @bind="v_objXK.NCC_ID" class="form-control">
             <option value="" selected disabled>Hãy chọn Nhà cung cấp</option>
@@ -33,12 +33,21 @@
         </select>
 
     </div>
-    <div class="form-group">
+    <div class="form-control">
+        <label>Ngày xuất kho: </label>
+        <TelerikDatePicker @bind-Value="v_objXK.Ngay_Xuat_Kho"
+                           Format="dd/MM/yyyy"
+                           Width="300px"
+                           Size="lg"
+                           Min="@Min" Max="@Max">
+        </TelerikDatePicker>
+    </div>
+    <div class="form-control">
         <label for="note">Ghi Chú</label>
         <InputText id="note" @bind-Value="v_objXK.Ghi_Chu" class="form-control"></InputText>
     </div>
 
-    <div class="form-group">
+    <div class="form-control">
         <label for="SP">Sản Phẩm</label>
         <TelerikMultiSelect @ref="multiSelect" Data=@v_arrSP
                             TextField="Ten_San_Pham" ValueField="Ma_San_Pham"
@@ -117,7 +126,9 @@
     private List<string> v_arrSelectedValues = new();
     private List<string> v_arrPreviousSelected = new();
     TelerikMultiSelect<CDM_San_Pham, string> multiSelect = new();
-
+    //For date picker
+    public DateTime Min = new DateTime(1990, 1, 1, 8, 15, 0);
+    public DateTime Max = new DateTime(2025, 1, 1, 19, 30, 45);
     //Function
     protected override void OnInitialized()
     {
@@ -188,8 +199,8 @@
             if (v_ires > 0)
             {
                 await Swal.FireAsync(
-                    "Insert all completed",
-                    "Your data has been added.",
+                    "Thêm dữ liệu hoàn tất",
+                    "Tất cả dữ liệu đã được thêm mới.",
                     SweetAlertIcon.Success
                     );
                 NavigationManager.NavigateTo("/XK");

@@ -5,35 +5,65 @@
 @inject SweetAlertService Swal
 <h3>Danh sách Kho User</h3>
 <br />
-<!--Nút thêm mới-->
+@* <!--Nút thêm mới-->
 <button type="button"
         class="btn btn-primary"
-        @onclick="AddKU">
     <span class="oi oi-plus"></span>
     Thêm Kho User
-</button>
+</button> *@
 <br />
-<br />
-<!-- Thanh tìm kiếm -->
-<div class="input-group">
-    <input type="text"
-           class="form-control"
-           placeholder="Điền tên kho để tìm kiếm"
-           @bind-value="v_strSearchTerm" />
-    <button type="button"
-            class="btn-success input-group-text"
-            @onclick="OnSearch">
-        <span class="oi oi-magnifying-glass"></span>
-        Tìm kiếm
+<EditForm Model="v_objKhoUser" OnValidSubmit="AddKU">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <!--Nút thêm mới-->
+    <button type="submit"
+            class="btn btn-primary"
+        <span class="oi oi-plus"></span>
+        Thêm Kho User
     </button>
+    <br />
+    <div class="form-control">
+        <label for="name">Mã Đăng Nhập</label>
+        <InputText id="name" @bind-Value="v_objKhoUser.Ma_Dang_Nhap" class="form-control"></InputText>
+    </div>
+    
+</EditForm>
+<!--Filter kho-->
+<div class="form-control">
+    <label for="Kho">Kho</label>
+    <select id="Kho" @bind-value="v_objKhoUser.Kho_ID"
+            @onchange="OnKhoSeleted" @bind-value:event="oninput"
+            class="form-control">
+        <option value="" selected disabled>Hãy chọn Kho</option>
+        @foreach (var item in v_arrKho)
+        {
+            <option value="@item.Ma_Kho">@item.Ten_Kho</option>
+        }
+    </select>
 </div>
+
+@if (IsInserted)
+{
+    if (v_ires == 1)
+    {
+        <p class="alert alert-success">Thêm mới thành công</p>
+    }
+    else
+    {
+        <p class="alert alert-danger">Thêm mới thất bại</p>
+        if (!string.IsNullOrEmpty(v_strArlertMessage))
+        {
+            <p class="alert alert-danger">@v_strArlertMessage</p>
+        }
+    }
+}
 <br />
 <!-- Danh sách-->
 <table class="table"
     <thead>
         <tr>
             <th>Mã Đăng Nhập</th>
-            <th>Mã Kho</th>
+            <th>Tên Kho</th>
         </tr>
     </thead>
     <tbody>
@@ -41,14 +71,14 @@
         {
                 <tr>
                     <td>@item.Ma_Dang_Nhap</td>
-                    <td>@item.Kho_ID</td>
+                        <td>@v_objKhoController.FQ_114_K_sp_sel_Get_By_ID(item.Kho_ID).Ten_Kho</td>
                     <td>
                         <button type="button"
                                 class="btn btn-success" @onclick="@(()=>EditKho(item.Ma_Dang_Nhap))">
-                                <span class="oi oi-pencil"></span> Edit</button>
+                            <span class="oi oi-pencil"></span> Sửa</button>
                         <button type="button"
                                 class="btn btn-danger" @onclick="@(()=>ShowConfirmation(item))">
-                                <span class="oi oi-trash"></span> Delete</button>
+                            <span class="oi oi-trash"></span> Xóa</button>
                     </td>
 
                 </tr>
@@ -59,9 +89,15 @@
 
 @code {
     private string v_strSearchTerm = string.Empty;
+    private string v_strMa_Dang_Nhap = string.Empty;
     public List<CDM_Kho_User> v_arrKhoUser = new();
+    public List<CDM_Kho> v_arrKho = new();
+    public CDM_Kho_User v_objKhoUser = new();
     CDM_Kho_User_Controller v_objKhoUserController = new();
-
+    CDM_Kho_Controller v_objKhoController = new();
+    private bool IsInserted = false;
+    private int v_ires = 0;
+    private string v_strArlertMessage = string.Empty;
     private void OnSearch()
     {
         if (string.IsNullOrEmpty(v_strSearchTerm))
@@ -69,13 +105,32 @@
             v_arrKhoUser = v_objKhoUserController.FQ_117_KU_sp_sel_List_For_Cache();
         }
     }
+    private void OnKhoSeleted()
+    {
+        v_arrKhoUser = v_objKhoUserController.FQ_117_KU_sp_sel_List_For_Cache();
+        v_arrKhoUser = v_arrKhoUser.Where(item => item.Kho_ID == v_objKhoUser.Kho_ID).ToList();
+    }
     protected override void OnInitialized()
     {
         v_arrKhoUser = v_objKhoUserController.FQ_117_KU_sp_sel_List_For_Cache();
+        v_arrKho = v_objKhoController.FQ_114_K_sp_sel_List_For_Cache();
     }
     private void AddKU()
     {
-        NavigationManager.NavigateTo("/AddKU");
+        //NavigationManager.NavigateTo("/AddKU");
+        if (this.v_objKhoUser == null) return;
+        try
+        {
+            IsInserted = true;
+            v_ires = v_objKhoUserController.FQ_117_KU_sp_ins_Insert(v_objKhoUser);
+        }
+        catch (Exception ex)
+        {
+            v_ires = 0;
+            v_strArlertMessage = ex.Message;
+            Console.WriteLine(ex.ToString());
+        }
+        OnKhoSeleted();
     }
     private void EditKho(string p_strMa_Dang_Nhap)
     {
@@ -98,13 +153,13 @@
     {
         var result = await Swal.FireAsync(new SweetAlertOptions
             {
-                Title = "Are you sure?",
-                Text = "You will not be able to recover this!",
+                Title = "Bạn chắc chứ?",
+                Text = "Dữ liệu này sẽ mất sau khi xóa!",
                 Icon = SweetAlertIcon.Warning,
                 ShowCancelButton = true,
-                ConfirmButtonText = "Yes, delete it!",
+                ConfirmButtonText = "Xóa!",
                 ConfirmButtonColor = "red",
-                CancelButtonText = "No, keep it"
+                CancelButtonText = "Hủy bỏ"
             });
         if (!string.IsNullOrEmpty(result.Value))
         {
@@ -113,8 +168,8 @@
             if (v_iRes > 0)
             {
                 await Swal.FireAsync(
-                  "Deleted",
-                  "Your data has been deleted.",
+                  "Đã xóa",
+                  "Dữ liệu của bạn đã được xóa thành công.",
                   SweetAlertIcon.Success
                   );
                 v_arrKhoUser.Remove(v_objKhoUser);
@@ -124,8 +179,8 @@
             if (v_iRes == 0 || v_iRes == -1)
             {
                 await Swal.FireAsync(
-                  "Cancelled",
-                  "Something wrong happened",
+                  "Hủy bỏ",
+                  "Xóa không thành công!",
                   SweetAlertIcon.Error
                   );
             }

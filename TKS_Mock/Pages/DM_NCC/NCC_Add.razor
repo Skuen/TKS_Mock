@@ -33,6 +33,10 @@
     else
     {
         <p class="alert alert-danger">Thêm mới thất bại</p>
+        if (!string.IsNullOrEmpty(v_strArlertMessage))
+        {
+            <p class="alert alert-danger">@v_strArlertMessage</p>
+        }
     }
 }
 @code {
@@ -40,6 +44,7 @@
     private CDM_NCC_Controller v_objKhoController = new();
     private bool IsInserted = false;
     private int v_ires = 0;
+    private string v_strArlertMessage = string.Empty;
     private void InsertNCC()
     {
         if (this.v_objNCC != null)
@@ -52,6 +57,7 @@
             catch (Exception ex)
             {
                 v_ires = 0;
+                v_strArlertMessage = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
 

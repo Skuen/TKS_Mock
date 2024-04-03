@@ -65,7 +65,7 @@ namespace TKS_Mock_Data_Access.Entity
                 m_strNCC_ID = value.Trim();
             }
         }
-
+        [Required(ErrorMessage = "Ngày nhập kho là bắt buộc")]
         public DateTime? Ngay_Nhap_Kho
         {
             get

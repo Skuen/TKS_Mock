@@ -106,7 +106,7 @@ namespace TKS_Mock_Data_Access.Controller
             try
             {
                 v_iRes = CSqlHelper.ExecuteNonquery(CConfig.TKS_Mock_Conn_String, "FQ_728_XK_sp_ins_Insert",
-                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ghi_Chu);
+                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ngay_Xuat_Kho, p_objData.Ghi_Chu);
             }
 
             catch (Exception ex)
@@ -124,7 +124,7 @@ namespace TKS_Mock_Data_Access.Controller
             try
             {
                 v_iRes = CSqlHelper.ExecuteNonquery(p_conn, p_trans, CConfig.TKS_Mock_Conn_String, "FQ_728_XK_sp_ins_Insert",
-                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ghi_Chu);
+                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ngay_Xuat_Kho, p_objData.Ghi_Chu);
             }
 
             catch (Exception ex)
@@ -141,7 +141,7 @@ namespace TKS_Mock_Data_Access.Controller
             try
             {
                 v_iRes = CSqlHelper.ExecuteNonquery(CConfig.TKS_Mock_Conn_String, "FQ_728_XK_sp_upd_Update", 
-                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ghi_Chu);
+                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ngay_Xuat_Kho, p_objData.Ghi_Chu);
             }
 
             catch (Exception ex)
@@ -157,7 +157,7 @@ namespace TKS_Mock_Data_Access.Controller
             try
             {
                 v_iRes = CSqlHelper.ExecuteNonquery(p_conn, p_trans, CConfig.TKS_Mock_Conn_String, "FQ_728_XK_sp_upd_Update",
-                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ghi_Chu);
+                    p_objData.So_Phieu_Xuat_Kho, p_objData.Kho_ID, p_objData.NCC_ID, p_objData.Ngay_Xuat_Kho, p_objData.Ghi_Chu);
             }
 
             catch (Exception ex)
